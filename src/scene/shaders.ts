@@ -47,8 +47,8 @@ void main() {
   float rim = pow(1.0 - abs(dot(normalize(vNormal), vec3(0.15, 0.8, 0.4))), 3.0);
 
   vec3 col = base;
-  col += uGlow * (0.08 + uHot * 0.55) * rim;
-  col += uGlow * uHot * 0.18 * fresnel;
+  col += uGlow * (0.12 + uHot * 0.75) * rim;
+  col += uGlow * uHot * 0.28 * fresnel;
   col += vec3(0.04, 0.05, 0.03) * (1.0 - vUv.y);
 
   float heightFade = smoothstep(-0.2, 0.35, vWorld.y);

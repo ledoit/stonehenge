@@ -19,14 +19,14 @@ npm run dev
 
 ## Canonical URLs
 
-| Product | Public | Legacy alias |
-|---------|--------|--------------|
-| Hub | https://menhir-holdings.com | — |
-| Matrix Maze | https://matrix-maze.menhir-holdings.com | matrix-maze-kappa.vercel.app |
-| Strob | https://strob.menhir-holdings.com | strob.vercel.app |
-| Vecchio | https://vecchio.menhir-holdings.com | vecchi.vercel.app |
-| JobJeeves | https://jobjeeves.menhir-holdings.com | jobjeeves.vercel.app |
-| Paid | https://paid.menhir-holdings.com | paid-eight.vercel.app |
-| Gamma | https://gamma.menhir-holdings.com | gammacolor.vercel.app |
+| Product | URL |
+|---------|-----|
+| Hub | https://menhir-holdings.com |
+| Matrix Maze | https://matrix-maze.menhir-holdings.com |
+| Strob | https://strob.menhir-holdings.com |
+| Vecchio | https://vecchio.menhir-holdings.com |
+| JobJeeves | https://jobjeeves.menhir-holdings.com |
+| Paid | https://paid.menhir-holdings.com |
+| Gamma | https://gamma.menhir-holdings.com |
 
 See [docs/DNS.md](./docs/DNS.md) and [docs/VERCEL.md](./docs/VERCEL.md).
