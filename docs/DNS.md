@@ -1,34 +1,38 @@
-# DNS — menhir-holdings.com
+# DNS — menhir-holdings.com (Cloudflare)
 
-Leave **Zoho Mail** records alone (MX, SPF, DKIM, `zb04905990`). Always **DNS only** (grey cloud) for mail.
+Leave **Zoho Mail** alone: MX, SPF, DKIM, `zb04905990` — always **DNS only** (grey cloud).
 
-## Apex hub (this project)
+After these are saved, Vercel issues certs. Start **DNS only**; optional orange-cloud later with SSL = **Full (strict)**.
 
-Add in Cloudflare after the Vercel project shows the domains:
-
-| Type | Name | Content | Proxy |
-|------|------|---------|-------|
-| A | `@` | `76.76.21.21` | DNS only first |
-| CNAME | `www` | `cname.vercel-dns.com` | DNS only first |
-
-Or CNAME-flatten `@` → `cname.vercel-dns.com` if your Cloudflare plan supports it.
-
-## Product subdomains (canonical public URLs)
+## Add these records
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
-| CNAME | `matrix-maze` | `cname.vercel-dns.com` | DNS only first |
-| CNAME | `strob` | `cname.vercel-dns.com` | DNS only first |
-| CNAME | `vecchio` | `cname.vercel-dns.com` | DNS only first |
-| CNAME | `jobjeeves` | `cname.vercel-dns.com` | DNS only first |
-| CNAME | `paid` | `cname.vercel-dns.com` | DNS only first |
-| CNAME | `gamma` | `cname.vercel-dns.com` | DNS only first |
-| CNAME | `vega` | `cname.vercel-dns.com` | DNS only first |
+| A | `@` | `76.76.21.21` | DNS only |
+| CNAME | `www` | `cname.vercel-dns.com` | DNS only |
+| CNAME | `matrix-maze` | `cname.vercel-dns.com` | DNS only |
+| CNAME | `strob` | `cname.vercel-dns.com` | DNS only |
+| CNAME | `vecchio` | `cname.vercel-dns.com` | DNS only |
+| CNAME | `jobjeeves` | `cname.vercel-dns.com` | DNS only |
+| CNAME | `paid` | `cname.vercel-dns.com` | DNS only |
+| CNAME | `gamma` | `cname.vercel-dns.com` | DNS only |
+| CNAME | `vega` | `cname.vercel-dns.com` | DNS only |
 
-## Remove after SyncStation retirement
+## Remove
 
 | Action | Name |
 |--------|------|
 | Delete CNAME | `syncstation` |
 
-After apex SSL is green in Vercel, you may optionally orange-cloud proxy with Cloudflare SSL = **Full (strict)**.
+## Already on Vercel (awaiting DNS)
+
+| Hostname | Project |
+|----------|---------|
+| `menhir-holdings.com` + `www` | `menhir-holdings` |
+| `matrix-maze.menhir-holdings.com` | `matrix-maze` |
+| `strob.menhir-holdings.com` | `strob` |
+| `vecchio.menhir-holdings.com` | `vecchio` |
+| `jobjeeves.menhir-holdings.com` | `jobjeeves` |
+| `paid.menhir-holdings.com` | `paid` |
+| `gamma.menhir-holdings.com` | `gamma` |
+| `vega.menhir-holdings.com` | `vega` (was already assigned) |

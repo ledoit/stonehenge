@@ -15,7 +15,7 @@ for (const [i, p] of projects.entries()) {
   const li = document.createElement("li");
   const a = document.createElement("a");
   a.href = p.href;
-  a.textContent = `${i + 1}. ${p.name} — ${p.tagline}`;
+  a.textContent = `${i + 1}. ${p.name} (${p.canonical}) — ${p.tagline}`;
   li.appendChild(a);
   a11y.appendChild(li);
 }
@@ -26,7 +26,7 @@ function showHud(index: number | null) {
     return;
   }
   const p = projects[index]!;
-  hudIndex.textContent = `${String(index + 1).padStart(2, "0")} / 0${projects.length}`;
+  hudIndex.textContent = p.canonical;
   hudName.textContent = p.name;
   hudTag.textContent = p.tagline;
   hud.classList.add("is-hot");
