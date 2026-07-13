@@ -28,6 +28,8 @@ const field = createField(canvas);
 const mobile =
   window.matchMedia("(max-width: 720px), (pointer: coarse)").matches;
 
+if (mobile) field.setCompactFraming(true);
+
 for (const [i, p] of projects.entries()) {
   const li = document.createElement("li");
   const a = document.createElement("a");
@@ -67,9 +69,13 @@ let opening = false;
 let pointerId: number | null = null;
 let down = { x: 0, y: 0 };
 let last = { x: 0, y: 0 };
+let lastT = 0;
 let dragged = false;
-const DRAG_PX = mobile ? 14 : 8;
-const SWIPE_PX = 56;
+/** Recent samples for fling velocity (rad/s). */
+const samples: { t: number; x: number }[] = [];
+const DRAG_PX = mobile ? 12 : 8;
+/** Radians of ring rotation per pixel of horizontal swipe. */
+const RAD_PER_PX = (Math.PI * 2) / (Math.min(window.innerWidth, 420) * 1.15);
 
 function syncFacingHud() {
   const idx = field.facingIndex();
@@ -79,11 +85,11 @@ function syncFacingHud() {
   }
 }
 
-/** Restore hub after browser back (bfcache keeps the enter veil / opening flag). */
 function restoreFromExit() {
   opening = false;
   pointerId = null;
   dragged = false;
+  samples.length = 0;
   veil.classList.remove("is-entering");
   field.abortEnter();
   const idx = field.getFocus() ?? field.facingIndex();
@@ -93,7 +99,6 @@ function restoreFromExit() {
 
 window.addEventListener("pageshow", (e) => {
   restoreFromExit();
-  // Dead WebGL context after bfcache — hard refresh is the reliable fix
   if (e.persisted) {
     const gl = field.renderer.getContext();
     if (gl.isContextLost()) {
@@ -103,10 +108,7 @@ window.addEventListener("pageshow", (e) => {
 });
 
 window.addEventListener("pagehide", () => {
-  // If navigation is cancelled / back is imminent, don't leave veil stuck mid-frame
-  if (opening) {
-    veil.classList.remove("is-entering");
-  }
+  if (opening) veil.classList.remove("is-entering");
 });
 
 async function openProject(index: number) {
@@ -138,14 +140,29 @@ function stepStone(dir: 1 | -1) {
   focusStone(next, true);
 }
 
+function pushSample(x: number, t: number) {
+  samples.push({ x, t });
+  while (samples.length > 6) samples.shift();
+}
+
+function flingVelocity(): number {
+  if (samples.length < 2) return 0;
+  const a = samples[0]!;
+  const b = samples[samples.length - 1]!;
+  const dt = (b.t - a.t) / 1000;
+  if (dt < 0.012) return 0;
+  // Finger right → ring turns opposite (same as dragYaw sign)
+  return -((b.x - a.x) * RAD_PER_PX) / dt;
+}
+
 if (hint) {
   hint.textContent = mobile
-    ? "swipe to turn · tap to enter"
+    ? "swipe the circle · tap to enter"
     : "move to turn · click or enter to open";
 }
 if (rail && mobile) {
   rail.innerHTML =
-    "<span>swipe</span><span class=\"rail__sep\">·</span><span>tap enter</span>";
+    "<span>flick to spin</span><span class=\"rail__sep\">·</span><span>tap enter</span>";
 }
 
 canvas.addEventListener("pointerdown", (e) => {
@@ -154,6 +171,9 @@ canvas.addEventListener("pointerdown", (e) => {
   dragged = false;
   down = { x: e.clientX, y: e.clientY };
   last = { x: e.clientX, y: e.clientY };
+  lastT = performance.now();
+  samples.length = 0;
+  pushSample(e.clientX, lastT);
   canvas.setPointerCapture(e.pointerId);
   field.setDragging(true);
 
@@ -167,22 +187,30 @@ canvas.addEventListener("pointermove", (e) => {
   if (opening) return;
 
   if (pointerId === e.pointerId) {
+    const now = performance.now();
     const dx = e.clientX - last.x;
     const dy = e.clientY - last.y;
     last = { x: e.clientX, y: e.clientY };
+    lastT = now;
 
     if (Math.hypot(e.clientX - down.x, e.clientY - down.y) > DRAG_PX) {
       dragged = true;
     }
 
-    if (dragged && !mobile) {
-      field.orbit(dx, dy);
-      syncFacingHud();
+    if (dragged) {
+      if (mobile) {
+        // Horizontal drag turns the whole henge; vertical ignored for orbit
+        field.dragYaw(-dx * RAD_PER_PX);
+        pushSample(e.clientX, now);
+        syncFacingHud();
+      } else {
+        field.orbit(dx, dy);
+        syncFacingHud();
+      }
     }
     return;
   }
 
-  // Desktop free-look only (no cursor on touch)
   if (mobile) return;
 
   const { nx, ny } = pointerNorm(e);
@@ -209,15 +237,13 @@ function endPointer(e: PointerEvent) {
   if (opening) return;
 
   if (mobile) {
-    const dx = e.clientX - down.x;
-    const dy = e.clientY - down.y;
-    if (Math.abs(dx) > SWIPE_PX && Math.abs(dx) > Math.abs(dy) * 1.2) {
-      stepStone(dx < 0 ? 1 : -1);
+    if (dragged) {
+      pushSample(e.clientX, performance.now());
+      field.flingYaw(flingVelocity());
+      // HUD follows during coast via rAF poll
       return;
     }
-    if (!dragged) {
-      void openProject(field.getFocus() ?? field.facingIndex());
-    }
+    void openProject(field.getFocus() ?? field.facingIndex());
     return;
   }
 
@@ -231,6 +257,15 @@ function endPointer(e: PointerEvent) {
 
 canvas.addEventListener("pointerup", endPointer);
 canvas.addEventListener("pointercancel", endPointer);
+
+// Keep HUD in sync while the ring is coasting / snapping
+if (mobile) {
+  const syncLoop = () => {
+    if (!opening) syncFacingHud();
+    requestAnimationFrame(syncLoop);
+  };
+  requestAnimationFrame(syncLoop);
+}
 
 canvas.addEventListener(
   "wheel",

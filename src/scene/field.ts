@@ -11,15 +11,18 @@ export type FieldApi = {
   setFocus: (index: number | null) => void;
   getFocus: () => number | null;
   pick: (x: number, y: number) => number | null;
-  /** -1..1 pointer position → free-look around the circle (no click). */
   setLook: (nx: number, ny: number) => void;
   setDragging: (dragging: boolean) => void;
   orbit: (dx: number, dy: number) => void;
-  /** Rotate so stone `index` sits in front of the camera. */
+  /** Mobile: rotate ring by radians while finger is down. */
+  dragYaw: (deltaRad: number) => void;
+  /** Mobile: release with angular velocity (rad/s); coasts then snaps. */
+  flingYaw: (velocityRadPerSec: number) => void;
   faceStone: (index: number) => void;
   facingIndex: () => number;
+  /** Pull camera back / widen FOV so the full circle reads on a phone. */
+  setCompactFraming: (on: boolean) => void;
   enter: (index: number) => Promise<void>;
-  /** Undo in-progress enter (bfcache / back button). */
   abortEnter: () => void;
   dispose: () => void;
 };
@@ -74,7 +77,6 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   ground.position.y = 0.01;
   scene.add(ground);
 
-  // Distant brand monolith — typography as landscape, not UI chrome
   const brandGeo = new THREE.PlaneGeometry(18, 4.5);
   const brandCanvas = document.createElement("canvas");
   brandCanvas.width = 2048;
@@ -103,7 +105,12 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   const stones = projects.map((p, i) => createStone(p, i, projects.length));
   for (const s of stones) scene.add(s.group);
 
-  const CAM_R = 11.5;
+  let camR = 11.5;
+  let camYBase = 3.2;
+  let lookY = 1.55;
+  let compact = false;
+  const fog = scene.fog as THREE.FogExp2;
+
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let focus: number | null = null;
@@ -112,7 +119,9 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   let pitch = 0;
   let targetYaw = yaw;
   let targetPitch = 0;
-  let lookMode = true; // free-look from pointer position
+  let lookMode = true;
+  let yawVel = 0;
+  let coasting = false;
   let entering = false;
   let enterT = 0;
   let enterResolve: (() => void) | null = null;
@@ -124,6 +133,9 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   const reduced =
     typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  const SNAP_VEL = 0.35; // rad/s — below this, settle onto nearest stone
+  const FRICTION = 3.2; // exponential decay rate
+
   function setFocus(index: number | null) {
     focus = index;
   }
@@ -132,11 +144,11 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     return focus;
   }
 
-  function facingIndex(): number {
+  function facingFrom(angle: number): number {
     let best = 0;
     let bestAbs = Infinity;
     for (const s of stones) {
-      const d = Math.abs(angleDelta(stoneYaw(s), yaw));
+      const d = Math.abs(angleDelta(stoneYaw(s), angle));
       if (d < bestAbs) {
         bestAbs = d;
         best = s.index;
@@ -145,10 +157,22 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     return best;
   }
 
+  function facingIndex(): number {
+    return facingFrom(yaw);
+  }
+
   function faceStone(index: number) {
     lookMode = false;
+    coasting = false;
+    yawVel = 0;
     targetYaw = stoneYaw(stones[index]!);
     setFocus(index);
+  }
+
+  function snapToNearest() {
+    const idx = facingFrom(targetYaw);
+    faceStone(idx);
+    return idx;
   }
 
   function pick(clientX: number, clientY: number): number | null {
@@ -164,29 +188,78 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     return hits[0]!.object.userData.index as number;
   }
 
-  /** Map screen pointer (-1..1) to a full orbit around the ring. */
   function setLook(nx: number, ny: number) {
-    if (dragging || entering) return;
+    if (dragging || entering || coasting) return;
     lookMode = true;
-    // Full turn: left edge → opposite side of circle from right edge
+    yawVel = 0;
     targetYaw = nx * Math.PI;
     targetPitch = THREE.MathUtils.clamp(-ny * 0.32, -0.28, 0.36);
   }
 
   function orbit(dx: number, dy: number) {
     lookMode = false;
+    coasting = false;
+    yawVel = 0;
     targetYaw -= dx * 0.0055;
     targetPitch = THREE.MathUtils.clamp(targetPitch + dy * 0.0035, -0.28, 0.38);
   }
 
+  function dragYaw(deltaRad: number) {
+    lookMode = false;
+    coasting = false;
+    yawVel = 0;
+    targetYaw += deltaRad;
+    // Keep visual yaw tight to the finger while dragging
+    yaw += deltaRad;
+  }
+
+  function flingYaw(velocityRadPerSec: number) {
+    lookMode = false;
+    const v = THREE.MathUtils.clamp(velocityRadPerSec, -14, 14);
+    if (Math.abs(v) < SNAP_VEL) {
+      snapToNearest();
+      return;
+    }
+    yawVel = v;
+    coasting = true;
+  }
+
   function setDragging(value: boolean) {
     dragging = value;
-    if (value) lookMode = false;
+    if (value) {
+      lookMode = false;
+      coasting = false;
+      yawVel = 0;
+    }
+  }
+
+  function setCompactFraming(on: boolean) {
+    compact = on;
+    if (on) {
+      camR = 15.4;
+      camYBase = 4.35;
+      lookY = 1.35;
+      camera.fov = 56;
+      fog.density = 0.038;
+      targetPitch = 0.12;
+      pitch = 0.12;
+      brand.position.set(0, 6.2, -12);
+    } else {
+      camR = 11.5;
+      camYBase = 3.2;
+      lookY = 1.55;
+      camera.fov = 42;
+      fog.density = 0.055;
+      brand.position.set(0, 5.5, -10);
+    }
+    camera.updateProjectionMatrix();
   }
 
   function enter(index: number): Promise<void> {
     entering = true;
     enterT = 0;
+    coasting = false;
+    yawVel = 0;
     faceStone(index);
 
     const stone = stones[index]!;
@@ -212,6 +285,8 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     }
     entering = false;
     enterT = 0;
+    coasting = false;
+    yawVel = 0;
   }
 
   function onResize() {
@@ -229,22 +304,34 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
 
     groundMat.uniforms.uTime!.value = t;
 
-    const damp = dragging ? 0.2 : lookMode ? 0.07 : 0.12;
-    yaw += angleDelta(targetYaw, yaw) * damp;
-    // keep yaw unbounded numerically but stable
-    pitch += (targetPitch - pitch) * damp;
+    // Inertial coast after a fling, then magnetic snap to nearest menhir
+    if (coasting && !dragging && !entering) {
+      targetYaw += yawVel * dt;
+      yaw += yawVel * dt;
+      yawVel *= Math.exp(-FRICTION * dt);
+      if (Math.abs(yawVel) < SNAP_VEL) {
+        coasting = false;
+        yawVel = 0;
+        snapToNearest();
+      }
+    } else if (!dragging && !entering) {
+      const damp = lookMode ? 0.07 : 0.14;
+      yaw += angleDelta(targetYaw, yaw) * damp;
+    }
+    // while dragging, dragYaw already keeps yaw in lockstep with the finger
+
+    pitch += (targetPitch - pitch) * (dragging ? 0.25 : 0.1);
 
     if (!entering) {
       const breathe = reduced ? 0 : Math.sin(t * 0.35) * 0.15;
-      const radius = CAM_R - pitch * 1.35;
-      // Same angular frame as stones: cos/sin → stone sits between camera and origin
+      const radius = camR - pitch * (compact ? 0.9 : 1.35);
       const camX = Math.cos(yaw) * radius;
       const camZ = Math.sin(yaw) * radius;
-      const camY = 3.2 + pitch * 1.55 + breathe;
+      const camY = camYBase + pitch * (compact ? 1.1 : 1.55) + breathe;
       camera.position.x += (camX - camera.position.x) * 0.08;
       camera.position.y += (camY - camera.position.y) * 0.08;
       camera.position.z += (camZ - camera.position.z) * 0.08;
-      camera.lookAt(0, 1.55 + pitch * 0.45, 0);
+      camera.lookAt(0, lookY + pitch * 0.45, 0);
     } else {
       enterT += dt;
       const k = Math.min(1, enterT / (reduced ? 0.35 : 0.95));
@@ -285,8 +372,11 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     setLook,
     setDragging,
     orbit,
+    dragYaw,
+    flingYaw,
     faceStone,
     facingIndex,
+    setCompactFraming,
     enter,
     abortEnter,
     dispose() {
