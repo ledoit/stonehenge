@@ -19,6 +19,8 @@ export type FieldApi = {
   faceStone: (index: number) => void;
   facingIndex: () => number;
   enter: (index: number) => Promise<void>;
+  /** Undo in-progress enter (bfcache / back button). */
+  abortEnter: () => void;
   dispose: () => void;
 };
 
@@ -203,6 +205,15 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     });
   }
 
+  function abortEnter() {
+    if (enterResolve) {
+      enterResolve();
+      enterResolve = null;
+    }
+    entering = false;
+    enterT = 0;
+  }
+
   function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -277,6 +288,7 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     faceStone,
     facingIndex,
     enter,
+    abortEnter,
     dispose() {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);

@@ -205,21 +205,47 @@ body {
 }
 
 @media (max-width: 720px) {
+  .mast {
+    top: max(1rem, env(safe-area-inset-top));
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+  }
+
   .mast__brand {
-    font-size: clamp(2.1rem, 12vw, 3.2rem);
+    font-size: clamp(2rem, 11vw, 2.8rem);
   }
 
   .mast__line {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
   }
 
   .rail {
-    display: none;
+    display: flex;
+    left: 1rem;
+    right: auto;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
   }
 
   .hud {
-    bottom: clamp(1.25rem, 5vh, 2.25rem);
-    max-width: calc(100vw - 2rem);
+    left: 0;
+    right: 0;
+    bottom: max(2.75rem, calc(env(safe-area-inset-bottom) + 2.5rem));
+    max-width: none;
+    margin: 0 0.75rem;
+    padding: 0.9rem 1rem 1rem;
+    border-left: none;
+    border-top: 2px solid color-mix(in oklab, var(--lichen) 70%, transparent);
+    background: linear-gradient(
+      180deg,
+      rgba(12, 14, 10, 0.82) 0%,
+      rgba(12, 14, 10, 0.55) 100%
+    );
+  }
+
+  .hud__name {
+    font-size: clamp(1.75rem, 8vw, 2.4rem);
   }
 }
 

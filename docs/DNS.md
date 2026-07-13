@@ -2,21 +2,35 @@
 
 Leave **Zoho Mail** alone: MX, SPF, DKIM, `zb04905990` — always **DNS only** (grey cloud).
 
-After these are saved, Vercel issues certs. Start **DNS only**; optional orange-cloud later with SSL = **Full (strict)**.
+**Canonical hub URL:** `https://menhir-holdings.com` (apex, no `www`).  
+`www` and `menhir-holdings.vercel.app` should redirect there.
 
-## Add these records
+Proxy column = Cloudflare **DNS only** (grey cloud) until certs are green. Optional orange-cloud later with SSL = **Full (strict)**.
+
+## Hub (update to Vercel’s new target)
+
+Vercel’s IP expansion: prefer the project-specific CNAME below. Old `A 76.76.21.21` / `cname.vercel-dns.com` still work but are legacy.
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
-| A | `@` | `76.76.21.21` | DNS only |
-| CNAME | `www` | `cname.vercel-dns.com` | DNS only |
-| CNAME | `matrix-maze` | `cname.vercel-dns.com` | DNS only |
-| CNAME | `strob` | `cname.vercel-dns.com` | DNS only |
-| CNAME | `vecchio` | `cname.vercel-dns.com` | DNS only |
-| CNAME | `jobjeeves` | `cname.vercel-dns.com` | DNS only |
-| CNAME | `paid` | `cname.vercel-dns.com` | DNS only |
-| CNAME | `gamma` | `cname.vercel-dns.com` | DNS only |
-| CNAME | `vega` | `cname.vercel-dns.com` | DNS only |
+| CNAME | `@` | `3b1305dd97e170ad.vercel-dns-017.com` | DNS only |
+| CNAME | `www` | `3b1305dd97e170ad.vercel-dns-017.com` | DNS only |
+
+Cloudflare supports CNAME on `@` (CNAME flattening). If you still have `A @ → 76.76.21.21`, **replace** it with the CNAME above.
+
+## Product subdomains
+
+If a product’s Vercel Domains screen shows a **new** `*.vercel-dns-017.com` target, use that. Otherwise `cname.vercel-dns.com` is fine until Vercel prompts you.
+
+| Type | Name | Content | Proxy |
+|------|------|---------|-------|
+| CNAME | `matrix-maze` | `cname.vercel-dns.com` *(or Vercel’s shown target)* | DNS only |
+| CNAME | `strob` | same | DNS only |
+| CNAME | `vecchio` | same | DNS only |
+| CNAME | `jobjeeves` | same | DNS only |
+| CNAME | `paid` | same | DNS only |
+| CNAME | `gamma` | same | DNS only |
+| CNAME | `vega` | same | DNS only |
 
 ## Remove
 
@@ -24,19 +38,10 @@ After these are saved, Vercel issues certs. Start **DNS only**; optional orange-
 |--------|------|
 | Delete CNAME | `syncstation` |
 
-## Legacy aliases
+## Redirects
 
-Each product’s `*.vercel.app` host 301s to its `*.menhir-holdings.com` canonical URL (via `vercel.json` redirects).
-
-## Already on Vercel (awaiting DNS)
-
-| Hostname | Project |
-|----------|---------|
-| `menhir-holdings.com` + `www` | `menhir-holdings` |
-| `matrix-maze.menhir-holdings.com` | `matrix-maze` |
-| `strob.menhir-holdings.com` | `strob` |
-| `vecchio.menhir-holdings.com` | `vecchio` |
-| `jobjeeves.menhir-holdings.com` | `jobjeeves` |
-| `paid.menhir-holdings.com` | `paid` |
-| `gamma.menhir-holdings.com` | `gamma` |
-| `vega.menhir-holdings.com` | `vega` (was already assigned) |
+| From | To |
+|------|-----|
+| `www.menhir-holdings.com` | `https://menhir-holdings.com` |
+| `menhir-holdings.vercel.app` | `https://menhir-holdings.com` |
+| `{product}.vercel.app` | `https://{product}.menhir-holdings.com` |
