@@ -13,9 +13,10 @@ npm run dev
 
 ## Controls
 
-- Drag / wheel — orbit the circle
-- Hover or `1`–`6` — focus a stone
+- Move pointer — free-look around the full stone circle
+- Hover / face a stone — HUD updates
 - Click or Enter — walk into the product
+- `1`–`6` / arrows — jump to a stone
 
 ## Canonical URLs
 

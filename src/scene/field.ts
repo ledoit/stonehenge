@@ -11,11 +11,27 @@ export type FieldApi = {
   setFocus: (index: number | null) => void;
   getFocus: () => number | null;
   pick: (x: number, y: number) => number | null;
+  /** -1..1 pointer position → free-look around the circle (no click). */
+  setLook: (nx: number, ny: number) => void;
   setDragging: (dragging: boolean) => void;
   orbit: (dx: number, dy: number) => void;
+  /** Rotate so stone `index` sits in front of the camera. */
+  faceStone: (index: number) => void;
+  facingIndex: () => number;
   enter: (index: number) => Promise<void>;
   dispose: () => void;
 };
+
+function stoneYaw(stone: MenhirStone): number {
+  return Math.atan2(stone.group.position.z, stone.group.position.x);
+}
+
+function angleDelta(a: number, b: number): number {
+  let d = a - b;
+  while (d > Math.PI) d -= Math.PI * 2;
+  while (d < -Math.PI) d += Math.PI * 2;
+  return d;
+}
 
 export function createField(canvas: HTMLCanvasElement): FieldApi {
   const renderer = new THREE.WebGLRenderer({
@@ -30,17 +46,17 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x12140f, 0.048);
+  scene.fog = new THREE.FogExp2(0x12140f, 0.055);
 
   const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 80);
-  camera.position.set(0, 3.4, 12.2);
+  camera.position.set(0, 3.2, 11.5);
 
-  const hemi = new THREE.HemisphereLight(0xc4d0b8, 0x1a1812, 1.0);
+  const hemi = new THREE.HemisphereLight(0xb8c4a8, 0x1a1812, 0.85);
   scene.add(hemi);
-  const key = new THREE.DirectionalLight(0xfff2d6, 0.7);
+  const key = new THREE.DirectionalLight(0xfff2d6, 0.55);
   key.position.set(4, 10, 6);
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0x7a9aaa, 0.35);
+  const rim = new THREE.DirectionalLight(0x6a8a9a, 0.25);
   rim.position.set(-6, 3, -4);
   scene.add(rim);
 
@@ -56,13 +72,14 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   ground.position.y = 0.01;
   scene.add(ground);
 
+  // Distant brand monolith — typography as landscape, not UI chrome
   const brandGeo = new THREE.PlaneGeometry(18, 4.5);
   const brandCanvas = document.createElement("canvas");
   brandCanvas.width = 2048;
   brandCanvas.height = 512;
   const ctx = brandCanvas.getContext("2d")!;
   ctx.clearRect(0, 0, 2048, 512);
-  ctx.fillStyle = "rgba(231, 225, 212, 0.11)";
+  ctx.fillStyle = "rgba(231, 225, 212, 0.07)";
   ctx.font = "800 280px Syne, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -75,6 +92,7 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
       map: brandTex,
       transparent: true,
       depthWrite: false,
+      opacity: 1,
     }),
   );
   brand.position.set(0, 5.5, -10);
@@ -83,14 +101,16 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   const stones = projects.map((p, i) => createStone(p, i, projects.length));
   for (const s of stones) scene.add(s.group);
 
+  const CAM_R = 11.5;
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let focus: number | null = null;
   let dragging = false;
-  let yaw = 0;
+  let yaw = stoneYaw(stones[0]!);
   let pitch = 0;
-  let targetYaw = 0;
+  let targetYaw = yaw;
   let targetPitch = 0;
+  let lookMode = true; // free-look from pointer position
   let entering = false;
   let enterT = 0;
   let enterResolve: (() => void) | null = null;
@@ -110,6 +130,25 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     return focus;
   }
 
+  function facingIndex(): number {
+    let best = 0;
+    let bestAbs = Infinity;
+    for (const s of stones) {
+      const d = Math.abs(angleDelta(stoneYaw(s), yaw));
+      if (d < bestAbs) {
+        bestAbs = d;
+        best = s.index;
+      }
+    }
+    return best;
+  }
+
+  function faceStone(index: number) {
+    lookMode = false;
+    targetYaw = stoneYaw(stones[index]!);
+    setFocus(index);
+  }
+
   function pick(clientX: number, clientY: number): number | null {
     const rect = canvas.getBoundingClientRect();
     pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
@@ -123,28 +162,38 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     return hits[0]!.object.userData.index as number;
   }
 
+  /** Map screen pointer (-1..1) to a full orbit around the ring. */
+  function setLook(nx: number, ny: number) {
+    if (dragging || entering) return;
+    lookMode = true;
+    // Full turn: left edge → opposite side of circle from right edge
+    targetYaw = nx * Math.PI;
+    targetPitch = THREE.MathUtils.clamp(-ny * 0.32, -0.28, 0.36);
+  }
+
   function orbit(dx: number, dy: number) {
-    targetYaw -= dx * 0.0045;
-    targetPitch = THREE.MathUtils.clamp(targetPitch + dy * 0.0032, -0.28, 0.38);
+    lookMode = false;
+    targetYaw -= dx * 0.0055;
+    targetPitch = THREE.MathUtils.clamp(targetPitch + dy * 0.0035, -0.28, 0.38);
   }
 
   function setDragging(value: boolean) {
     dragging = value;
+    if (value) lookMode = false;
   }
 
   function enter(index: number): Promise<void> {
     entering = true;
     enterT = 0;
-    setFocus(index);
+    faceStone(index);
 
     const stone = stones[index]!;
     stone.mesh.getWorldPosition(enterLook);
     enterLook.y += stone.project.height * 0.28;
 
-    // Approach from camera side of the stone (outward from circle center)
     const outward = new THREE.Vector3(stone.group.position.x, 0, stone.group.position.z)
       .normalize()
-      .multiplyScalar(2.4);
+      .multiplyScalar(2.6);
     enterTo.copy(enterLook).add(outward);
     enterTo.y = Math.max(enterTo.y, 2.2);
     enterFrom.copy(camera.position);
@@ -169,20 +218,22 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
 
     groundMat.uniforms.uTime!.value = t;
 
-    const damp = dragging ? 0.18 : 0.1;
-    yaw += (targetYaw - yaw) * damp;
+    const damp = dragging ? 0.2 : lookMode ? 0.07 : 0.12;
+    yaw += angleDelta(targetYaw, yaw) * damp;
+    // keep yaw unbounded numerically but stable
     pitch += (targetPitch - pitch) * damp;
 
     if (!entering) {
-      const breathe = reduced ? 0 : Math.sin(t * 0.35) * 0.12;
-      const radius = 12.2 - pitch * 1.4;
-      const camX = Math.sin(yaw) * radius * 0.22;
-      const camZ = Math.cos(yaw * 0.15) * radius;
-      const camY = 3.2 + pitch * 1.6 + breathe;
-      camera.position.x += (camX - camera.position.x) * 0.06;
-      camera.position.y += (camY - camera.position.y) * 0.06;
-      camera.position.z += (camZ - camera.position.z) * 0.06;
-      camera.lookAt(Math.sin(yaw) * 0.8, 1.7 + pitch * 0.4, 0);
+      const breathe = reduced ? 0 : Math.sin(t * 0.35) * 0.15;
+      const radius = CAM_R - pitch * 1.35;
+      // Same angular frame as stones: cos/sin → stone sits between camera and origin
+      const camX = Math.cos(yaw) * radius;
+      const camZ = Math.sin(yaw) * radius;
+      const camY = 3.2 + pitch * 1.55 + breathe;
+      camera.position.x += (camX - camera.position.x) * 0.08;
+      camera.position.y += (camY - camera.position.y) * 0.08;
+      camera.position.z += (camZ - camera.position.z) * 0.08;
+      camera.lookAt(0, 1.55 + pitch * 0.45, 0);
     } else {
       enterT += dt;
       const k = Math.min(1, enterT / (reduced ? 0.35 : 0.95));
@@ -199,11 +250,11 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     for (const s of stones) {
       const hot = focus === s.index ? 1 : 0;
       const cur = s.material.uniforms.uHot!.value as number;
-      s.material.uniforms.uHot!.value = cur + (hot - cur) * 0.12;
+      s.material.uniforms.uHot!.value = cur + (hot - cur) * 0.1;
       s.material.uniforms.uTime!.value = t;
-      const lift = hot * 0.14;
-      s.group.position.y += (lift - s.group.position.y) * 0.1;
-      s.group.scale.setScalar(1 + hot * 0.04);
+      const lift = hot * 0.12;
+      s.group.position.y += (lift - s.group.position.y) * 0.08;
+      s.group.scale.setScalar(1 + hot * 0.03);
     }
 
     brand.rotation.y = Math.sin(t * 0.08) * 0.04;
@@ -220,8 +271,11 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     setFocus,
     getFocus,
     pick,
+    setLook,
     setDragging,
     orbit,
+    faceStone,
+    facingIndex,
     enter,
     dispose() {
       cancelAnimationFrame(raf);

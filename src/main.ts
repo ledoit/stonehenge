@@ -40,8 +40,9 @@ function showHud(index: number | null) {
   hud.classList.add("is-hot");
 }
 
-function focusStone(index: number | null) {
-  field.setFocus(index);
+function focusStone(index: number, face = false) {
+  if (face) field.faceStone(index);
+  else field.setFocus(index);
   showHud(index);
 }
 
@@ -50,15 +51,33 @@ let pointerId: number | null = null;
 let down = { x: 0, y: 0 };
 let last = { x: 0, y: 0 };
 let dragged = false;
-const DRAG_PX = 6;
+const DRAG_PX = 8;
+
+function syncFacingHud() {
+  const idx = field.facingIndex();
+  if (field.getFocus() !== idx) {
+    field.setFocus(idx);
+    showHud(idx);
+  }
+}
 
 async function openProject(index: number) {
   if (opening) return;
   opening = true;
-  focusStone(index);
+  focusStone(index, true);
   veil.classList.add("is-entering");
   await field.enter(index);
   window.location.href = projects[index]!.href;
+}
+
+function pointerNorm(e: PointerEvent) {
+  const rect = canvas.getBoundingClientRect();
+  const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+  return {
+    nx: Math.max(-1, Math.min(1, nx)),
+    ny: Math.max(-1, Math.min(1, ny)),
+  };
 }
 
 canvas.addEventListener("pointerdown", (e) => {
@@ -86,13 +105,21 @@ canvas.addEventListener("pointermove", (e) => {
 
     if (dragged) {
       field.orbit(dx, dy);
+      syncFacingHud();
     }
     return;
   }
 
-  // Hover (no active drag): pick stone under cursor, keep last focus on miss
+  // Free-look: cursor position orbits the full ring — no click required
+  const { nx, ny } = pointerNorm(e);
+  field.setLook(nx, ny);
+
   const hit = field.pick(e.clientX, e.clientY);
-  if (hit !== null) focusStone(hit);
+  if (hit !== null) {
+    focusStone(hit);
+  } else {
+    syncFacingHud();
+  }
 });
 
 function endPointer(e: PointerEvent) {
@@ -106,8 +133,10 @@ function endPointer(e: PointerEvent) {
   pointerId = null;
 
   if (!dragged) {
-    const hit = field.pick(e.clientX, e.clientY) ?? field.getFocus();
-    if (hit !== null) void openProject(hit);
+    const hit = field.pick(e.clientX, e.clientY) ?? field.getFocus() ?? field.facingIndex();
+    void openProject(hit);
+  } else {
+    syncFacingHud();
   }
 }
 
@@ -118,9 +147,9 @@ canvas.addEventListener(
   "wheel",
   (e) => {
     e.preventDefault();
-    // Normalize across devices (pixel / line / page)
     const scale = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 40 : 1;
-    field.orbit(e.deltaX * scale * 0.35, e.deltaY * scale * 0.35);
+    field.orbit(e.deltaX * scale * 0.45, e.deltaY * scale * 0.45);
+    syncFacingHud();
   },
   { passive: false },
 );
@@ -129,30 +158,27 @@ window.addEventListener("keydown", (e) => {
   if (opening) return;
 
   if (e.key >= "1" && e.key <= String(projects.length)) {
-    focusStone(Number(e.key) - 1);
+    focusStone(Number(e.key) - 1, true);
     return;
   }
 
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
     e.preventDefault();
-    const cur = field.getFocus() ?? 0;
+    const cur = field.getFocus() ?? field.facingIndex();
     const next =
       e.key === "ArrowRight"
         ? (cur + 1) % projects.length
         : (cur - 1 + projects.length) % projects.length;
-    focusStone(next);
+    focusStone(next, true);
     return;
   }
 
   if (e.key === "Enter" || e.key === " ") {
-    const cur = field.getFocus();
-    if (cur !== null) {
-      e.preventDefault();
-      void openProject(cur);
-    }
+    const cur = field.getFocus() ?? field.facingIndex();
+    e.preventDefault();
+    void openProject(cur);
   }
 });
 
-window.setTimeout(() => {
-  if (field.getFocus() === null) focusStone(0);
-}, 400);
+// Start facing first stone
+focusStone(0, true);

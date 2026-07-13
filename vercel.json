@@ -1,3 +1,11 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "menhir-holdings.vercel.app" }],
+      "destination": "https://menhir-holdings.com/:path*",
+      "permanent": true
+    }
+  ]
 }
