@@ -1,0 +1,227 @@
+:root {
+  --fog: #12140f;
+  --mist: #1c1f18;
+  --bone: #e7e1d4;
+  --ash: #9a9488;
+  --lichen: #c9a24a;
+  --iron: #2a2822;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--fog);
+  color: var(--bone);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+body {
+  cursor: crosshair;
+}
+
+#field {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+.veil {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  background: radial-gradient(
+    ellipse 70% 55% at 50% 42%,
+    transparent 0%,
+    transparent 45%,
+    rgba(18, 20, 15, 0.35) 72%,
+    rgba(18, 20, 15, 0.92) 100%
+  );
+  mix-blend-mode: multiply;
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+
+.veil.is-entering {
+  opacity: 1;
+  background: var(--fog);
+  mix-blend-mode: normal;
+  transition: opacity 0.05s linear, background 1.1s cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.mast {
+  position: fixed;
+  top: clamp(1.25rem, 4vh, 2.5rem);
+  left: clamp(1.25rem, 4vw, 2.75rem);
+  z-index: 10;
+  max-width: min(28rem, 86vw);
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+}
+
+.mast__sigil {
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  color: var(--lichen);
+  margin-bottom: 0.75rem;
+  opacity: 0.7;
+}
+
+.mast__brand {
+  font-family: Syne, system-ui, sans-serif;
+  font-weight: 800;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  font-size: clamp(2.6rem, 9vw, 5.5rem);
+  text-transform: uppercase;
+  color: var(--bone);
+}
+
+.mast__word {
+  display: block;
+}
+
+.mast__hold {
+  display: block;
+  opacity: 0.55;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.mast__line {
+  margin-top: 1rem;
+  max-width: 22rem;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+
+.hud {
+  position: fixed;
+  left: clamp(1.25rem, 4vw, 2.75rem);
+  bottom: clamp(3.5rem, 10vh, 5.5rem);
+  z-index: 10;
+  max-width: min(26rem, 88vw);
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition:
+    opacity 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+
+.hud.is-hot {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hud__index {
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--lichen);
+  margin-bottom: 0.55rem;
+}
+
+.hud__name {
+  font-family: Syne, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--bone);
+}
+
+.hud__tag {
+  margin-top: 0.65rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ash);
+  max-width: 22rem;
+}
+
+.hud__hint {
+  margin-top: 1rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--ash) 70%, transparent);
+}
+
+.rail {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vh, 1.75rem);
+  z-index: 10;
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  font-size: 0.58rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--ash) 55%, transparent);
+  pointer-events: none;
+}
+
+.rail__sep {
+  opacity: 0.4;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 720px) {
+  .mast {
+    mix-blend-mode: normal;
+  }
+
+  .mast__brand {
+    font-size: clamp(2.1rem, 12vw, 3.2rem);
+  }
+
+  .mast__line {
+    display: none;
+  }
+
+  .rail {
+    display: none;
+  }
+
+  .hud {
+    bottom: clamp(1.5rem, 6vh, 2.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud,
+  .veil {
+    transition: none;
+  }
+}

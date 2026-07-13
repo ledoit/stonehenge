@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Menhir Holdings — a field of products. Approach a stone to enter."
+    />
+    <meta name="theme-color" content="#12140f" />
+    <title>Menhir Holdings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <canvas id="field" aria-hidden="true"></canvas>
+
+    <div class="veil" id="veil" aria-hidden="true"></div>
+
+    <header class="mast">
+      <p class="mast__sigil" aria-hidden="true">▣</p>
+      <h1 class="mast__brand">
+        <span class="mast__word">Menhir</span>
+        <span class="mast__hold">Holdings</span>
+      </h1>
+      <p class="mast__line">A clearing. Six stones. Enter what you stand before.</p>
+    </header>
+
+    <aside class="hud" id="hud" aria-live="polite">
+      <p class="hud__index" id="hud-index"></p>
+      <h2 class="hud__name" id="hud-name"></h2>
+      <p class="hud__tag" id="hud-tag"></p>
+      <p class="hud__hint" id="hud-hint">click · enter · or press the number</p>
+    </aside>
+
+    <nav class="sr-only" aria-label="Projects">
+      <ul id="a11y-list"></ul>
+    </nav>
+
+    <footer class="rail" aria-hidden="true">
+      <span>drag to look</span>
+      <span class="rail__sep">·</span>
+      <span>1–6 select</span>
+      <span class="rail__sep">·</span>
+      <span>enter open</span>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
