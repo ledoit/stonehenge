@@ -1,11 +1,23 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "redirects": [
     {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "menhir-holdings.vercel.app" }],
       "destination": "https://menhir-holdings.com/:path*",
       "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "menhir-holdings-menhir-tech.vercel.app" }],
+      "destination": "https://menhir-holdings.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.menhir-holdings.com" }],
+      "destination": "https://menhir-holdings.com/:path*",
+      "permanent": true
     }
-  ]
+  ],
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

@@ -24,6 +24,10 @@ After these are saved, Vercel issues certs. Start **DNS only**; optional orange-
 |--------|------|
 | Delete CNAME | `syncstation` |
 
+## Legacy aliases
+
+Each product’s `*.vercel.app` host 301s to its `*.menhir-holdings.com` canonical URL (via `vercel.json` redirects).
+
 ## Already on Vercel (awaiting DNS)
 
 | Hostname | Project |

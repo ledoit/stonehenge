@@ -1,6 +1,18 @@
 import { projects } from "./data/projects";
 import { createField } from "./scene/field";
 
+// Canonical host — *.vercel.app / www → menhir-holdings.com
+(() => {
+  const host = window.location.hostname;
+  if (host === "menhir-holdings.com") return;
+  if (host.endsWith(".vercel.app") || host === "www.menhir-holdings.com") {
+    const next = new URL(window.location.href);
+    next.hostname = "menhir-holdings.com";
+    next.protocol = "https:";
+    window.location.replace(next.toString());
+  }
+})();
+
 const canvas = document.querySelector<HTMLCanvasElement>("#field")!;
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const hudIndex = document.querySelector<HTMLElement>("#hud-index")!;
