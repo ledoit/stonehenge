@@ -3,12 +3,6 @@
   "redirects": [
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "stonehenge.vercel.app" }],
-      "destination": "https://menhir-holdings.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
       "has": [{ "type": "host", "value": "stonehenge-menhir-tech.vercel.app" }],
       "destination": "https://menhir-holdings.com/:path*",
       "permanent": true

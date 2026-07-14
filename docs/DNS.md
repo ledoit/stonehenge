@@ -3,7 +3,10 @@
 Leave **Zoho Mail** alone: MX, SPF, DKIM, `zb04905990` — always **DNS only** (grey cloud).
 
 **Canonical hub URL:** `https://menhir-holdings.com` (apex, no `www`).  
-`www`, `stonehenge.vercel.app`, and legacy `menhir-holdings.vercel.app` should redirect there.
+`www`, `stonehenge-menhir-tech.vercel.app`, and legacy `menhir-holdings.vercel.app` should redirect there.
+
+(`stonehenge.vercel.app` is taken outside this team — use the `*-menhir-tech` alias.)
+
 
 Proxy column = Cloudflare **DNS only** (grey cloud) until certs are green. Optional orange-cloud later with SSL = **Full (strict)**.
 
@@ -43,6 +46,6 @@ If a product’s Vercel Domains screen shows a **new** `*.vercel-dns-017.com` ta
 | From | To |
 |------|-----|
 | `www.menhir-holdings.com` | `https://menhir-holdings.com` |
-| `stonehenge.vercel.app` | `https://menhir-holdings.com` |
+| `stonehenge-menhir-tech.vercel.app` | `https://menhir-holdings.com` |
 | `menhir-holdings.vercel.app` (legacy) | `https://menhir-holdings.com` |
 | `{product}.vercel.app` | `https://{product}.menhir-holdings.com` |
