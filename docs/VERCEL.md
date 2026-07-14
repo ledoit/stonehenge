@@ -22,7 +22,7 @@ npx vercel@54 <command> --scope menhir-tech
 
 | GitHub | Vercel | Canonical URL | Legacy alias |
 |--------|--------|---------------|--------------|
-| [menhir-holdings](https://github.com/ledoit/menhir-holdings) | `menhir-holdings` | https://menhir-holdings.com | — |
+| [stonehenge](https://github.com/ledoit/stonehenge) | `stonehenge` | https://menhir-holdings.com | stonehenge.vercel.app |
 | [Matrix-Maze](https://github.com/ledoit/Matrix-Maze) | `matrix-maze` | https://matrix-maze.menhir-holdings.com | matrix-maze-kappa.vercel.app |
 | [Strob](https://github.com/ledoit/Strob) | `strob` | https://strob.menhir-holdings.com | strob.vercel.app |
 | [Vecchio](https://github.com/ledoit/Vecchio) | `vecchio` | https://vecchio.menhir-holdings.com | vecchi.vercel.app |

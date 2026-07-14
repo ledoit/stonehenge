@@ -1,5 +1,7 @@
 # Menhir Holdings
 
+Repo / Vercel project: **`stonehenge`**. Public domain stays **menhir-holdings.com**.
+
 The apex site is not a brochure. It is a **clearing** — six standing stones in fog. Approach one to enter a product.
 
 **Stack:** Vite + TypeScript + Three.js (no React, no Next). Static WebGL, deployed on Vercel.
