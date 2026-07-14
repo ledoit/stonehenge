@@ -22,14 +22,14 @@ npx vercel@54 <command> --scope menhir-tech
 
 | GitHub | Vercel | Canonical URL | Legacy alias |
 |--------|--------|---------------|--------------|
-| [stonehenge](https://github.com/ledoit/stonehenge) | `stonehenge` | https://menhir-holdings.com | stonehenge-menhir-tech.vercel.app · menhir-holdings.vercel.app |
-| [Matrix-Maze](https://github.com/ledoit/Matrix-Maze) | `matrix-maze` | https://matrix-maze.menhir-holdings.com | matrix-maze-kappa.vercel.app |
-| [Strob](https://github.com/ledoit/Strob) | `strob` | https://strob.menhir-holdings.com | strob.vercel.app |
-| [Vecchio](https://github.com/ledoit/Vecchio) | `vecchio` | https://vecchio.menhir-holdings.com | vecchi.vercel.app |
-| [JobJeeves](https://github.com/ledoit/JobJeeves) | `jobjeeves` | https://jobjeeves.menhir-holdings.com | jobjeeves.vercel.app |
-| [paid](https://github.com/ledoit/paid) | `paid` | https://paid.menhir-holdings.com | paid-eight.vercel.app |
-| [Gamma](https://github.com/ledoit/Gamma) | `gamma` | https://gamma.menhir-holdings.com | gammacolor.vercel.app |
-| [Vega](https://github.com/ledoit/Vega) | `vega` | https://vega.menhir-holdings.com | vega-chi-ten.vercel.app |
+| [stonehenge](https://github.com/menhir-holdings/stonehenge) | `stonehenge` | https://menhir-holdings.com | stonehenge-menhir-tech.vercel.app · menhir-holdings.vercel.app |
+| [Matrix-Maze](https://github.com/menhir-holdings/Matrix-Maze) | `matrix-maze` | https://matrix-maze.menhir-holdings.com | matrix-maze-kappa.vercel.app |
+| [Strob](https://github.com/menhir-holdings/Strob) | `strob` | https://strob.menhir-holdings.com | strob.vercel.app |
+| [Vecchio](https://github.com/menhir-holdings/Vecchio) | `vecchio` | https://vecchio.menhir-holdings.com | vecchi.vercel.app |
+| [JobJeeves](https://github.com/menhir-holdings/JobJeeves) | `jobjeeves` | https://jobjeeves.menhir-holdings.com | jobjeeves.vercel.app |
+| [paid](https://github.com/menhir-holdings/paid) | `paid` | https://paid.menhir-holdings.com | paid-eight.vercel.app |
+| [Gamma](https://github.com/menhir-holdings/Gamma) | `gamma` | https://gamma.menhir-holdings.com | gammacolor.vercel.app |
+| [Vega](https://github.com/menhir-holdings/Vega) | `vega` | https://vega.menhir-holdings.com | vega-chi-ten.vercel.app |
 
 ## Retired
 
