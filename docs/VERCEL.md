@@ -1,21 +1,21 @@
 # Menhir — Vercel & GitHub
 
-_Last updated: 2026-07-13_
+_Last updated: 2026-07-16_
 
 **Decision: deploy from GitHub, not local CLI.** Push to `main` → production.
 
 Scope all CLI calls:
 
 ```bash
-npx vercel@54 <command> --scope menhir-tech
+npx vercel@54 <command> --scope menhir-holdings
 ```
 
 ## Team
 
 | Item | Value |
 |------|-------|
-| Vercel team | `menhir-tech` |
-| GitHub | `ledoit` |
+| Vercel team | `menhir-holdings` |
+| GitHub | `menhir-holdings` |
 | Canonical domain | `*.menhir-holdings.com` |
 
 ## Published lattice (front-facing)
@@ -30,6 +30,8 @@ npx vercel@54 <command> --scope menhir-tech
 | [paid](https://github.com/menhir-holdings/paid) | `paid` | https://paid.menhir-holdings.com | paid-eight.vercel.app |
 | [Gamma](https://github.com/menhir-holdings/Gamma) | `gamma` | https://gamma.menhir-holdings.com | gammacolor.vercel.app |
 | [Vega](https://github.com/menhir-holdings/Vega) | `vega` | https://vega.menhir-holdings.com | vega-chi-ten.vercel.app |
+| [inferno](https://github.com/menhir-holdings/inferno) | `inferno` | https://inferno.menhir-holdings.com | inferno-ruby.vercel.app |
+| [gnomon](https://github.com/menhir-holdings/gnomon) | `gnomon` | https://gnomon.menhir-holdings.com | gnomon-pearl.vercel.app |
 
 ## Retired
 
@@ -38,6 +40,12 @@ npx vercel@54 <command> --scope menhir-tech
 | SyncStation | Deleted — Strob/Vecchio standalone again |
 | BOB | Deleted — Vega is the website/gallery product |
 | enjoyments_vectorized | Deleted with RnD |
+
+## Hidden sub-apps (same repo, not on portal)
+
+| Path | Domain | Notes |
+|------|--------|-------|
+| `kaiser/` | https://kaiser.menhir-holdings.com | Music stem preview console. Separate Vite app; Vercel **Root Directory** = `kaiser`. Not in `src/data/projects.ts`. |
 
 ## Other Vercel projects (not on apex portal)
 
