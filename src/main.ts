@@ -1,11 +1,17 @@
 import { projects } from "./data/projects";
 import { createField } from "./scene/field";
 
-// Canonical host — *.vercel.app / www → menhir-holdings.com
+// Canonical host — prod aliases / www → menhir-holdings.com (leave PR previews alone)
 (() => {
   const host = window.location.hostname;
   if (host === "menhir-holdings.com") return;
-  if (host.endsWith(".vercel.app") || host === "www.menhir-holdings.com") {
+  const prodAliases = new Set([
+    "www.menhir-holdings.com",
+    "menhir-holdings.vercel.app",
+    "stonehenge-menhir-tech.vercel.app",
+    "stonehenge.vercel.app",
+  ]);
+  if (prodAliases.has(host)) {
     const next = new URL(window.location.href);
     next.hostname = "menhir-holdings.com";
     next.protocol = "https:";
