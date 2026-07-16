@@ -4,6 +4,8 @@ _Last updated: 2026-07-16_
 
 **Decision: deploy from GitHub, not local CLI.** Push to `main` → production.
 
+Agent protocol (`do this` / `push` / `fix this`) lives in the workstation Cursor rule under `Menhir Holdings/.cursor/rules/` — not in this repo. This file is the deploy lattice only.
+
 Scope all CLI calls:
 
 ```bash
