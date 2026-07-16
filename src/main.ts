@@ -1,11 +1,17 @@
 import { projects } from "./data/projects";
 import { createField } from "./scene/field";
 
-// Canonical host — *.vercel.app / www → menhir-holdings.com
+// Canonical host — prod aliases / www → menhir-holdings.com (leave PR previews alone)
 (() => {
   const host = window.location.hostname;
   if (host === "menhir-holdings.com") return;
-  if (host.endsWith(".vercel.app") || host === "www.menhir-holdings.com") {
+  const prodAliases = new Set([
+    "www.menhir-holdings.com",
+    "menhir-holdings.vercel.app",
+    "stonehenge-menhir-tech.vercel.app",
+    "stonehenge.vercel.app",
+  ]);
+  if (prodAliases.has(host)) {
     const next = new URL(window.location.href);
     next.hostname = "menhir-holdings.com";
     next.protocol = "https:";
@@ -14,6 +20,7 @@ import { createField } from "./scene/field";
 })();
 
 const canvas = document.querySelector<HTMLCanvasElement>("#field")!;
+const reticle = document.querySelector<HTMLElement>("#reticle");
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const hudIndex = document.querySelector<HTMLElement>("#hud-index")!;
 const hudName = document.querySelector<HTMLElement>("#hud-name")!;
@@ -165,6 +172,22 @@ if (rail && mobile) {
     "<span>flick to spin</span><span class=\"rail__sep\">·</span><span>tap enter</span>";
 }
 
+if (reticle && !mobile) {
+  const showReticle = () => reticle.classList.add("is-active");
+  const hideReticle = () => reticle.classList.remove("is-active");
+  const moveReticle = (x: number, y: number) => {
+    reticle.style.left = `${x}px`;
+    reticle.style.top = `${y}px`;
+  };
+
+  window.addEventListener("pointermove", (e) => {
+    moveReticle(e.clientX, e.clientY);
+    showReticle();
+  });
+  window.addEventListener("pointerleave", hideReticle);
+  document.addEventListener("mouseleave", hideReticle);
+}
+
 canvas.addEventListener("pointerdown", (e) => {
   if (pointerId !== null || opening) return;
   pointerId = e.pointerId;
@@ -204,6 +227,7 @@ canvas.addEventListener("pointermove", (e) => {
         pushSample(e.clientX, now);
         syncFacingHud();
       } else {
+        // Drag left (dx < 0) → yaw up → CCW, same as cursor-left look
         field.orbit(dx, dy);
         syncFacingHud();
       }
@@ -222,6 +246,12 @@ canvas.addEventListener("pointermove", (e) => {
   } else {
     syncFacingHud();
   }
+});
+
+canvas.addEventListener("pointerleave", () => {
+  if (mobile || pointerId !== null || opening) return;
+  // Next entry re-anchors from current camera pose (no edge snap)
+  field.releaseLook();
 });
 
 function endPointer(e: PointerEvent) {
@@ -273,7 +303,8 @@ canvas.addEventListener(
     if (mobile || opening) return;
     e.preventDefault();
     const scale = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 40 : 1;
-    field.orbit(e.deltaX * scale * 0.45, e.deltaY * scale * 0.45);
+    // Same CCW sense as cursor-left: scroll/drag left turns pillars right
+    field.orbit(e.deltaX * scale * 1.8, e.deltaY * scale * 1.8);
     syncFacingHud();
   },
   { passive: false },

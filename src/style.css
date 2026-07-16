@@ -28,7 +28,27 @@ body {
 }
 
 body {
-  cursor: crosshair;
+  cursor: none;
+}
+
+.reticle {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+  z-index: 30;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.reticle.is-active {
+  opacity: 1;
 }
 
 #field {
@@ -46,11 +66,11 @@ body {
   pointer-events: none;
   z-index: 20;
   background: radial-gradient(
-    ellipse 75% 60% at 50% 42%,
+    ellipse 77% 64% at 50% 42%,
     transparent 0%,
-    transparent 48%,
-    rgba(18, 20, 15, 0.28) 75%,
-    rgba(18, 20, 15, 0.82) 100%
+    transparent 55%,
+    rgba(18, 20, 15, 0.19) 78%,
+    rgba(18, 20, 15, 0.59) 100%
   );
   opacity: 1;
   transition: background 0.8s ease;
@@ -204,7 +224,15 @@ body {
   border: 0;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px), (pointer: coarse) {
+  body {
+    cursor: auto;
+  }
+
+  .reticle {
+    display: none;
+  }
+
   .mast {
     top: max(1rem, env(safe-area-inset-top));
     left: 1rem;
