@@ -12,6 +12,8 @@ export type FieldApi = {
   getFocus: () => number | null;
   pick: (x: number, y: number) => number | null;
   setLook: (nx: number, ny: number) => void;
+  /** Drop look-mode anchor so the next pointer entry re-bases smoothly. */
+  releaseLook: () => void;
   setDragging: (dragging: boolean) => void;
   orbit: (dx: number, dy: number) => void;
   /** Mobile: rotate ring by radians while finger is down. */
@@ -118,6 +120,11 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   let targetYaw = yaw;
   let targetPitch = 0;
   let lookMode = true;
+  /** Cursor pose when lookMode engaged — relative look avoids snap from profile. */
+  let lookOriginNx = 0;
+  let lookOriginNy = 0;
+  let lookBaseYaw = 0;
+  let lookBasePitch = 0;
   let yawVel = 0;
   let coasting = false;
   let entering = false;
@@ -164,6 +171,8 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     coasting = false;
     yawVel = 0;
     targetYaw = stoneYaw(stones[index]!);
+    // Keep a calm profile pitch when locking to a stone
+    targetPitch = THREE.MathUtils.clamp(targetPitch * 0.35, -0.2, 0.25);
     setFocus(index);
   }
 
@@ -188,19 +197,32 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
 
   function setLook(nx: number, ny: number) {
     if (dragging || entering || coasting) return;
-    lookMode = true;
+    // First move after profile / orbit: anchor here so we never snap to absolute screen map
+    if (!lookMode) {
+      lookMode = true;
+      lookOriginNx = nx;
+      lookOriginNy = ny;
+      lookBaseYaw = yaw;
+      lookBasePitch = pitch;
+    }
     yawVel = 0;
-    targetYaw = nx * Math.PI;
-    // Vertical: invert prior sign, ×7; camera orbits floor origin (0,0,0)
-    targetPitch = THREE.MathUtils.clamp(-ny * 0.32 * 7, -1.4, 1.4);
+    const dnx = nx - lookOriginNx;
+    const dny = ny - lookOriginNy;
+    // Cursor left → yaw up → ring turns counterclockwise (pillars move right)
+    targetYaw = lookBaseYaw - dnx * Math.PI;
+    targetPitch = THREE.MathUtils.clamp(lookBasePitch - dny * 0.32 * 7, -1.4, 1.4);
+  }
+
+  function releaseLook() {
+    lookMode = false;
   }
 
   function orbit(dx: number, dy: number) {
     lookMode = false;
     coasting = false;
     yawVel = 0;
+    // Drag/scroll left (dx < 0) → yaw increases → same CCW sense as setLook
     targetYaw -= dx * 0.0055;
-    // Vertical orbit: invert prior dy sign, ×7
     targetPitch = THREE.MathUtils.clamp(targetPitch - dy * 0.0035 * 7, -1.4, 1.4);
   }
 
@@ -312,12 +334,13 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
         snapToNearest();
       }
     } else if (!dragging && !entering) {
-      const damp = lookMode ? 0.07 : 0.14;
+      // Softer catch-up in look mode so profile→cursor never feels snappy
+      const damp = lookMode ? 0.045 : 0.14;
       yaw += angleDelta(targetYaw, yaw) * damp;
     }
     // while dragging, dragYaw already keeps yaw in lockstep with the finger
 
-    pitch += (targetPitch - pitch) * (dragging ? 0.25 : 0.1);
+    pitch += (targetPitch - pitch) * (dragging ? 0.25 : lookMode ? 0.06 : 0.1);
 
     if (!entering) {
       const breathe = reduced ? 0 : Math.sin(t * 0.35) * 0.15;
@@ -371,6 +394,7 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     getFocus,
     pick,
     setLook,
+    releaseLook,
     setDragging,
     orbit,
     dragYaw,

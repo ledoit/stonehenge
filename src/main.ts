@@ -227,6 +227,7 @@ canvas.addEventListener("pointermove", (e) => {
         pushSample(e.clientX, now);
         syncFacingHud();
       } else {
+        // Drag left (dx < 0) → yaw up → CCW, same as cursor-left look
         field.orbit(dx, dy);
         syncFacingHud();
       }
@@ -245,6 +246,12 @@ canvas.addEventListener("pointermove", (e) => {
   } else {
     syncFacingHud();
   }
+});
+
+canvas.addEventListener("pointerleave", () => {
+  if (mobile || pointerId !== null || opening) return;
+  // Next entry re-anchors from current camera pose (no edge snap)
+  field.releaseLook();
 });
 
 function endPointer(e: PointerEvent) {
@@ -296,8 +303,8 @@ canvas.addEventListener(
     if (mobile || opening) return;
     e.preventDefault();
     const scale = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 40 : 1;
-    // Horizontal scroll inverted relative to natural trackpad delta
-    field.orbit(-e.deltaX * scale * 1.8, e.deltaY * scale * 1.8);
+    // Same CCW sense as cursor-left: scroll/drag left turns pillars right
+    field.orbit(e.deltaX * scale * 1.8, e.deltaY * scale * 1.8);
     syncFacingHud();
   },
   { passive: false },
