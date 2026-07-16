@@ -46,3 +46,5 @@ Expected OGG paths (relative to project folder):
 - `audio/sfx/level_complete.ogg`
 
 `accent` is always synthesized at runtime.
+
+**Canonical repo:** https://github.com/menhir-holdings/kaiser (Hobby plan cannot Git-connect private org repos). Local agent path: `Website/Kaiser`.
