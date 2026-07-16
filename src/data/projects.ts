@@ -9,6 +9,14 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    id: "inferno",
+    name: "Inferno",
+    tagline: "Fight reads under motor load — OODA in the rift",
+    href: "https://inferno.menhir-holdings.com",
+    glow: "#c4f000",
+    height: 3.5,
+  },
+  {
     id: "matrix-maze",
     name: "Matrix Maze",
     tagline: "A labyrinth that remembers how you move",
@@ -55,5 +63,13 @@ export const projects: Project[] = [
     href: "https://gamma.menhir-holdings.com",
     glow: "#e0a0a8",
     height: 3.2,
+  },
+  {
+    id: "gnomon",
+    name: "Gnomon",
+    tagline: "The hour the stone knows — shadow, sun, golden light",
+    href: "https://gnomon.menhir-holdings.com",
+    glow: "#d4a574",
+    height: 3.3,
   },
 ];

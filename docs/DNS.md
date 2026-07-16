@@ -33,6 +33,7 @@ If a product’s Vercel Domains screen shows a **new** `*.vercel-dns-017.com` ta
 | CNAME | `jobjeeves` | same | DNS only |
 | CNAME | `paid` | same | DNS only |
 | CNAME | `gamma` | same | DNS only |
+| CNAME | `inferno` | same | DNS only |
 | CNAME | `vega` | same | DNS only |
 
 ## Remove
