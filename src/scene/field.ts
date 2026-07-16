@@ -193,7 +193,8 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     lookMode = true;
     yawVel = 0;
     targetYaw = nx * Math.PI;
-    targetPitch = THREE.MathUtils.clamp(-ny * 0.32, -0.28, 0.36);
+    // Inverted vertical: cursor up → camera rises, scene dips beneath (bird POV)
+    targetPitch = THREE.MathUtils.clamp(ny * 0.32, -0.28, 0.36);
   }
 
   function orbit(dx: number, dy: number) {

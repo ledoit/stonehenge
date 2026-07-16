@@ -14,6 +14,7 @@ import { createField } from "./scene/field";
 })();
 
 const canvas = document.querySelector<HTMLCanvasElement>("#field")!;
+const reticle = document.querySelector<HTMLElement>("#reticle");
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const hudIndex = document.querySelector<HTMLElement>("#hud-index")!;
 const hudName = document.querySelector<HTMLElement>("#hud-name")!;
@@ -165,6 +166,22 @@ if (rail && mobile) {
     "<span>flick to spin</span><span class=\"rail__sep\">·</span><span>tap enter</span>";
 }
 
+if (reticle && !mobile) {
+  const showReticle = () => reticle.classList.add("is-active");
+  const hideReticle = () => reticle.classList.remove("is-active");
+  const moveReticle = (x: number, y: number) => {
+    reticle.style.left = `${x}px`;
+    reticle.style.top = `${y}px`;
+  };
+
+  window.addEventListener("pointermove", (e) => {
+    moveReticle(e.clientX, e.clientY);
+    showReticle();
+  });
+  window.addEventListener("pointerleave", hideReticle);
+  document.addEventListener("mouseleave", hideReticle);
+}
+
 canvas.addEventListener("pointerdown", (e) => {
   if (pointerId !== null || opening) return;
   pointerId = e.pointerId;
@@ -273,7 +290,7 @@ canvas.addEventListener(
     if (mobile || opening) return;
     e.preventDefault();
     const scale = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 40 : 1;
-    field.orbit(e.deltaX * scale * 0.45, e.deltaY * scale * 0.45);
+    field.orbit(e.deltaX * scale * 1.8, e.deltaY * scale * 1.8);
     syncFacingHud();
   },
   { passive: false },
