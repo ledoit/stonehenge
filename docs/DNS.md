@@ -35,6 +35,7 @@ If a product’s Vercel Domains screen shows a **new** `*.vercel-dns-017.com` ta
 | CNAME | `gamma` | same | DNS only |
 | CNAME | `inferno` | same | DNS only |
 | CNAME | `vega` | same | DNS only |
+| CNAME | `kaiser` | same | DNS only |
 
 ## Remove
 

@@ -1,6 +1,6 @@
 # Menhir — Vercel & GitHub
 
-_Last updated: 2026-07-13_
+_Last updated: 2026-07-16_
 
 **Decision: deploy from GitHub, not local CLI.** Push to `main` → production.
 
@@ -38,6 +38,12 @@ npx vercel@54 <command> --scope menhir-tech
 | SyncStation | Deleted — Strob/Vecchio standalone again |
 | BOB | Deleted — Vega is the website/gallery product |
 | enjoyments_vectorized | Deleted with RnD |
+
+## Hidden sub-apps (same repo, not on portal)
+
+| Path | Domain | Notes |
+|------|--------|-------|
+| `kaiser/` | https://kaiser.menhir-holdings.com | Music stem preview console. Separate Vite app; Vercel **Root Directory** = `kaiser`. Not in `src/data/projects.ts`. |
 
 ## Other Vercel projects (not on apex portal)
 
