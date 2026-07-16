@@ -1,0 +1,23 @@
+{
+  "id": "matrix-maze",
+  "name": "MATRIX-MAZE",
+  "stems": {
+    "base": "audio/music/matrix_maze_base.ogg",
+    "pressure": "audio/music/matrix_maze_pressure.ogg",
+    "chase": "audio/music/matrix_maze_chase.ogg",
+    "dread": "audio/music/matrix_maze_dread.ogg"
+  },
+  "sfx": {
+    "levelComplete": "audio/sfx/level_complete.ogg"
+  },
+  "levelMixes": [
+    { "base": 0.9, "pressure": 0.0, "chase": 0.0, "dread": 0.0, "accent": 0.0 },
+    { "base": 0.9, "pressure": 0.24, "chase": 0.0, "dread": 0.0, "accent": 0.0 },
+    { "base": 0.88, "pressure": 0.36, "chase": 0.0, "dread": 0.1, "accent": 0.0 },
+    { "base": 0.84, "pressure": 0.34, "chase": 0.22, "dread": 0.14, "accent": 0.0 },
+    { "base": 0.8, "pressure": 0.42, "chase": 0.4, "dread": 0.22, "accent": 0.0 },
+    { "base": 0.78, "pressure": 0.48, "chase": 0.52, "dread": 0.3, "accent": 0.14 },
+    { "base": 0.74, "pressure": 0.52, "chase": 0.6, "dread": 0.38, "accent": 0.22 },
+    { "base": 0.7, "pressure": 0.55, "chase": 0.68, "dread": 0.46, "accent": 0.3 }
+  ]
+}

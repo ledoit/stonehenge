@@ -1,0 +1,168 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #000000;
+  --fg: #33ff66;
+  --fg-dim: #1a8033;
+  --border: #33ff66;
+  --font: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+#app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.hdr {
+  margin: 0 0 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.hdr__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+
+.hdr__sub {
+  margin: 4px 0 0;
+  color: var(--fg-dim);
+  font-size: 12px;
+}
+
+.stat {
+  margin: 0 0 16px;
+  color: var(--fg-dim);
+  font-size: 12px;
+}
+
+.blk {
+  margin: 0 0 16px;
+  border: 1px solid var(--border);
+  padding: 8px 12px 12px;
+}
+
+.blk__hd {
+  padding: 0 4px;
+  color: var(--fg-dim);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.blk__bd {
+  margin-top: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 96px 52px 52px 1fr 40px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.row:last-child {
+  margin-bottom: 0;
+}
+
+.row__label {
+  color: var(--fg);
+  text-transform: lowercase;
+}
+
+.row__range {
+  min-width: 0;
+}
+
+.row__vol {
+  text-align: right;
+  color: var(--fg-dim);
+  font-size: 11px;
+}
+
+.ctl {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+button.ctl {
+  padding: 2px 6px;
+  min-width: 48px;
+}
+
+button.ctl:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+button.ctl:active {
+  background: var(--fg-dim);
+  color: var(--bg);
+}
+
+.ctl--select {
+  width: 100%;
+  padding: 4px 6px;
+}
+
+.ctl--num {
+  width: 48px;
+  padding: 2px 4px;
+}
+
+.ctl--range {
+  width: 100%;
+  height: 16px;
+  padding: 0;
+  accent-color: var(--fg);
+  cursor: pointer;
+}
+
+.ctl--range::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--fg-dim);
+}
+
+.ctl--range::-webkit-slider-thumb {
+  width: 10px;
+  height: 14px;
+  margin-top: -6px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--fg);
+  appearance: none;
+}
+
+.vol {
+  font-size: 11px;
+}
+
+fieldset {
+  min-width: 0;
+}
