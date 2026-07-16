@@ -66,11 +66,11 @@ body {
   pointer-events: none;
   z-index: 20;
   background: radial-gradient(
-    ellipse 75% 60% at 50% 42%,
+    ellipse 80% 68% at 50% 42%,
     transparent 0%,
-    transparent 48%,
-    rgba(18, 20, 15, 0.28) 75%,
-    rgba(18, 20, 15, 0.82) 100%
+    transparent 62%,
+    rgba(18, 20, 15, 0.1) 82%,
+    rgba(18, 20, 15, 0.36) 100%
   );
   opacity: 1;
   transition: background 0.8s ease;

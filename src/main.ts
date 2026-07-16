@@ -296,7 +296,8 @@ canvas.addEventListener(
     if (mobile || opening) return;
     e.preventDefault();
     const scale = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 40 : 1;
-    field.orbit(e.deltaX * scale * 1.8, e.deltaY * scale * 1.8);
+    // Horizontal scroll inverted relative to natural trackpad delta
+    field.orbit(-e.deltaX * scale * 1.8, e.deltaY * scale * 1.8);
     syncFacingHud();
   },
   { passive: false },

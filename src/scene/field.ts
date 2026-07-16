@@ -107,8 +107,6 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
 
   let camR = 11.5;
   let camYBase = 3.2;
-  let lookY = 1.55;
-  let compact = false;
   const fog = scene.fog as THREE.FogExp2;
 
   const raycaster = new THREE.Raycaster();
@@ -193,8 +191,8 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     lookMode = true;
     yawVel = 0;
     targetYaw = nx * Math.PI;
-    // Inverted vertical: cursor up → camera rises, scene dips beneath (bird POV)
-    targetPitch = THREE.MathUtils.clamp(ny * 0.32, -0.28, 0.36);
+    // Vertical: invert prior sign, ×7; camera orbits floor origin (0,0,0)
+    targetPitch = THREE.MathUtils.clamp(-ny * 0.32 * 7, -1.4, 1.4);
   }
 
   function orbit(dx: number, dy: number) {
@@ -202,7 +200,8 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     coasting = false;
     yawVel = 0;
     targetYaw -= dx * 0.0055;
-    targetPitch = THREE.MathUtils.clamp(targetPitch + dy * 0.0035, -0.28, 0.38);
+    // Vertical orbit: invert prior dy sign, ×7
+    targetPitch = THREE.MathUtils.clamp(targetPitch - dy * 0.0035 * 7, -1.4, 1.4);
   }
 
   function dragYaw(deltaRad: number) {
@@ -235,11 +234,9 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   }
 
   function setCompactFraming(on: boolean) {
-    compact = on;
     if (on) {
       camR = 15.4;
       camYBase = 4.35;
-      lookY = 1.35;
       camera.fov = 56;
       fog.density = 0.038;
       targetPitch = 0.12;
@@ -248,7 +245,6 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     } else {
       camR = 11.5;
       camYBase = 3.2;
-      lookY = 1.55;
       camera.fov = 42;
       fog.density = 0.055;
       brand.position.set(0, 5.5, -10);
@@ -325,14 +321,18 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
 
     if (!entering) {
       const breathe = reduced ? 0 : Math.sin(t * 0.35) * 0.15;
-      const radius = camR - pitch * (compact ? 0.9 : 1.35);
-      const camX = Math.cos(yaw) * radius;
-      const camZ = Math.sin(yaw) * radius;
-      const camY = camYBase + pitch * (compact ? 1.1 : 1.55) + breathe;
+      // Floor-grid center (0,0,0) is fixed CoG — camera rides a sphere around it
+      const dist = Math.hypot(camR, camYBase);
+      const baseElev = Math.atan2(camYBase, camR);
+      const elev = THREE.MathUtils.clamp(baseElev + pitch, 0.06, 1.45);
+      const cosE = Math.cos(elev);
+      const camX = Math.cos(yaw) * cosE * dist;
+      const camZ = Math.sin(yaw) * cosE * dist;
+      const camY = Math.sin(elev) * dist + breathe;
       camera.position.x += (camX - camera.position.x) * 0.08;
       camera.position.y += (camY - camera.position.y) * 0.08;
       camera.position.z += (camZ - camera.position.z) * 0.08;
-      camera.lookAt(0, lookY + pitch * 0.45, 0);
+      camera.lookAt(0, 0, 0);
     } else {
       enterT += dt;
       const k = Math.min(1, enterT / (reduced ? 0.35 : 0.95));
