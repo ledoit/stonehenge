@@ -41,11 +41,13 @@ npx vercel@54 <command> --scope menhir-holdings
 | BOB | Deleted — Vega is the website/gallery product |
 | enjoyments_vectorized | Deleted with RnD |
 
-## Hidden sub-apps (same repo, not on portal)
+## Hidden / internal tools (not on portal)
 
-| Path | Domain | Notes |
-|------|--------|-------|
-| `kaiser/` | https://kaiser.menhir-holdings.com | Music stem preview console. Separate Vite app; Vercel **Root Directory** = `kaiser`. Not in `src/data/projects.ts`. |
+| GitHub | Vercel | Canonical URL | Notes |
+|--------|--------|---------------|-------|
+| [kaiser](https://github.com/menhir-holdings/kaiser) | `kaiser` | https://kaiser.menhir-holdings.com | Music stem preview. Own public repo (Hobby cannot Git-connect private org repos). Not in `src/data/projects.ts`. Alias: kaiser-mu.vercel.app |
+
+`stonehenge/kaiser/` is a mirror stub — edit `Website/Kaiser` / `menhir-holdings/kaiser`.
 
 ## Other Vercel projects (not on apex portal)
 
