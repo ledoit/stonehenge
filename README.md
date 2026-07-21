@@ -33,3 +33,8 @@ npm run dev
 | Gamma | https://gamma.menhir-holdings.com |
 
 See [docs/DNS.md](./docs/DNS.md) and [docs/VERCEL.md](./docs/VERCEL.md).
+
+
+## License
+
+All Rights Reserved © Menhir Holdings
