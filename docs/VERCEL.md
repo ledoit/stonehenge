@@ -1,6 +1,6 @@
 # Menhir — Vercel & GitHub
 
-_Last updated: 2026-07-16_
+_Last updated: 2026-07-22_
 
 **Decision: deploy from GitHub, not local CLI.** Push to `main` → production.
 
@@ -34,6 +34,27 @@ npx vercel@54 <command> --scope menhir-holdings
 | [Vega](https://github.com/menhir-holdings/Vega) | `vega` | https://vega.menhir-holdings.com | vega-chi-ten.vercel.app |
 | [inferno](https://github.com/menhir-holdings/inferno) | `inferno` | https://inferno.menhir-holdings.com | inferno-ruby.vercel.app |
 | [diaries](https://github.com/menhir-holdings/diaries) | `diaries` | https://diaries.menhir-holdings.com | diaries-menhir-holdings.vercel.app |
+| [freeze](https://github.com/menhir-holdings/freeze) | `freeze` | https://freeze.menhir-holdings.com | freeze-lilac.vercel.app |
+
+## Deployment protection (SSO)
+
+Vercel **Deployment Protection → Vercel Authentication (SSO)** was blocking public product URLs with **403**. SSO is **disabled** on all lattice projects (2026-07-22):
+
+```bash
+for p in freeze stonehenge diaries inferno kaiser matrix-maze jobjeeves gamma paid strob vecchio vega; do
+  npx vercel@latest project protection disable "$p" --sso --scope menhir-holdings
+done
+```
+
+New projects: run the same `protection disable` after linking, or public URLs will 403.
+
+## Hobby plan — private GitHub org
+
+Hobby cannot auto-deploy from **private** `menhir-holdings` repos. CI may show Vercel check failures even when code is fine. Options: Pro team, public repo, or manual `vercel deploy --prod` from a linked local tree.
+
+## DNS vs Vercel nameservers
+
+`menhir-holdings.com` uses **Cloudflare** nameservers. Product CNAMEs live in Cloudflare (`docs/DNS.md`), not Vercel DNS — records added via `vercel dns add` only apply after switching NS to Vercel.
 
 ## Retired
 
