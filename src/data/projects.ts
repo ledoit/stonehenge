@@ -67,7 +67,7 @@ export const projects: Project[] = [
   {
     id: "diaries",
     name: "Diaries",
-    tagline: "Elite diary order — when every Hard is already done",
+    tagline: "Elites, UIM Secretary, stats checker — QP cape, Hards done",
     href: "https://diaries.menhir-holdings.com",
     glow: "#c4f000",
     height: 3.15,
