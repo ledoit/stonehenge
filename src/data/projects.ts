@@ -64,12 +64,4 @@ export const projects: Project[] = [
     glow: "#e0a0a8",
     height: 3.2,
   },
-  {
-    id: "gnomon",
-    name: "Gnomon",
-    tagline: "The hour the stone knows — shadow, sun, golden light",
-    href: "https://gnomon.menhir-holdings.com",
-    glow: "#d4a574",
-    height: 3.3,
-  },
 ];

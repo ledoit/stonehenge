@@ -33,7 +33,6 @@ npx vercel@54 <command> --scope menhir-holdings
 | [Gamma](https://github.com/menhir-holdings/Gamma) | `gamma` | https://gamma.menhir-holdings.com | gammacolor.vercel.app |
 | [Vega](https://github.com/menhir-holdings/Vega) | `vega` | https://vega.menhir-holdings.com | vega-chi-ten.vercel.app |
 | [inferno](https://github.com/menhir-holdings/inferno) | `inferno` | https://inferno.menhir-holdings.com | inferno-ruby.vercel.app |
-| [gnomon](https://github.com/menhir-holdings/gnomon) | `gnomon` | https://gnomon.menhir-holdings.com | gnomon-pearl.vercel.app |
 
 ## Retired
 
