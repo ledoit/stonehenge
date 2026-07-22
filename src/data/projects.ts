@@ -72,4 +72,12 @@ export const projects: Project[] = [
     glow: "#d4a574",
     height: 3.3,
   },
+  {
+    id: "echo",
+    name: "Echo",
+    tagline: "How long until the reply — light-time across the void",
+    href: "https://echo.menhir-holdings.com",
+    glow: "#5ac8fa",
+    height: 3.0,
+  },
 ];
