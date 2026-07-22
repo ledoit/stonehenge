@@ -64,4 +64,12 @@ export const projects: Project[] = [
     glow: "#e0a0a8",
     height: 3.2,
   },
+  {
+    id: "diaries",
+    name: "Diaries",
+    tagline: "Elite diary order — when every Hard is already done",
+    href: "https://diaries.menhir-holdings.com",
+    glow: "#c4f000",
+    height: 3.15,
+  },
 ];
