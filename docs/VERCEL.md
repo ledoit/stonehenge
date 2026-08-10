@@ -1,6 +1,6 @@
 # Menhir — Vercel & GitHub
 
-_Last updated: 2026-07-22_
+_Last updated: 2026-08-10_
 
 **Decision: deploy from GitHub, not local CLI.** Push to `main` → production.
 
@@ -35,14 +35,31 @@ npx vercel@54 <command> --scope menhir-holdings
 | [inferno](https://github.com/menhir-holdings/inferno) | `inferno` | https://inferno.menhir-holdings.com | inferno-ruby.vercel.app |
 | [diaries](https://github.com/menhir-holdings/diaries) | `diaries` | https://diaries.menhir-holdings.com | diaries-menhir-holdings.vercel.app |
 | [freeze](https://github.com/menhir-holdings/freeze) | `freeze` | https://freeze.menhir-holdings.com | freeze-lilac.vercel.app |
+| [Suplex](https://github.com/menhir-holdings/Suplex) | `suplex` | https://suplex.menhir-holdings.com | — |
+| [erudite](https://github.com/ledoit/erudite) (ex-waffle) | `erudite` | https://waffle.menhir-holdings.com | hostname legacy; project renamed 2026-08-10 |
+
+## Local category map (workstation)
+
+Vercel/GitHub are per-repo; paths below are Menhir Holdings checkout layout only:
+
+| Category | Products |
+|----------|----------|
+| `Hub/` | stonehenge, Eido, Freeze |
+| `Employment/` | jobjeeves, Paid, Vec, Vecchio, vega, photoport, phrased, Kerf, resumes |
+| `Game/` | Matrix-Maze, Diaries, Inferno, Suplex, Erudite, osrs-autoclicker |
+| `Audio/` | Kaiser (`composition/` + `console/` + `shared/`), Kithara |
+| `Color/` | Gamma, Strob, RobRoss |
+| `Media/` | Mangaphile |
+| `Car/` | Bucephalus |
+| `FinTech/` | Augur |
 
 ## Deployment protection (SSO)
 
 Vercel **Deployment Protection → Vercel Authentication (SSO)** was blocking public product URLs with **403**. SSO is **disabled** on all lattice projects (2026-07-22):
 
 ```bash
-for p in freeze stonehenge diaries inferno kaiser matrix-maze jobjeeves gamma paid strob vecchio vega; do
-  npx vercel@latest project protection disable "$p" --sso --scope menhir-holdings
+for p in freeze stonehenge diaries inferno kaiser matrix-maze jobjeeves gamma paid strob vecchio vega erudite suplex; do
+  npx vercel@54 project protection disable "$p" --sso --scope menhir-holdings
 done
 ```
 
@@ -70,7 +87,7 @@ Hobby cannot auto-deploy from **private** `menhir-holdings` repos. CI may show V
 |--------|--------|---------------|-------|
 | [kaiser](https://github.com/menhir-holdings/kaiser) | `kaiser` | https://kaiser.menhir-holdings.com | Music stem preview. Own public repo (Hobby cannot Git-connect private org repos). Not in `src/data/projects.ts`. Alias: kaiser-mu.vercel.app |
 
-`stonehenge/kaiser/` is a mirror stub — edit `Website/Kaiser` / `menhir-holdings/kaiser`.
+Kaiser console lives at `Audio/Kaiser/console/` (repo `menhir-holdings/kaiser`).
 
 ## Other Vercel projects (not on apex portal)
 
