@@ -1,6 +1,6 @@
 # Menhir — Vercel & GitHub
 
-_Last updated: 2026-07-22_
+_Last updated: 2026-09-08_
 
 **Decision: deploy from GitHub, not local CLI.** Push to `main` → production.
 
@@ -35,6 +35,23 @@ npx vercel@54 <command> --scope menhir-holdings
 | [inferno](https://github.com/menhir-holdings/inferno) | `inferno` | https://inferno.menhir-holdings.com | inferno-ruby.vercel.app |
 | [diaries](https://github.com/menhir-holdings/diaries) | `diaries` | https://diaries.menhir-holdings.com | diaries-menhir-holdings.vercel.app |
 | [freeze](https://github.com/menhir-holdings/freeze) | `freeze` | https://freeze.menhir-holdings.com | freeze-lilac.vercel.app |
+
+## Local category map (workstation)
+
+Vercel/GitHub are per-repo; paths below are Menhir Holdings checkout layout only:
+
+| Category | Products |
+|----------|----------|
+| `Web/` | stonehenge, menhir-web, Eido, Freeze |
+| `Flow/` | Silo, jobjeeves, Paid, Vecchio, phrased, resumes |
+| `Visual/` | Vantage, Holo, Dawk, Mangaphile, photoport, vega |
+| `Hub/` | Zipp (leftover; category TBD) |
+| `Employment/` | Azum, Kerf (leftover; category TBD) |
+| `Game/` | Matrix-Maze, Diaries, Inferno, Suplex, Erudite, osrs-autoclicker |
+| `Audio/` | Kaiser (`composition/` + `console/` + `shared/`), Kithara |
+| `Color/` | Gamma, Strob, RobRoss |
+| `Car/` | Bucephalus |
+| `FinTech/` | Augur |
 
 ## Deployment protection (SSO)
 
@@ -74,4 +91,4 @@ Hobby cannot auto-deploy from **private** `menhir-holdings` repos. CI may show V
 
 ## Other Vercel projects (not on apex portal)
 
-`eido`, `mangaphile`, `musa`, `scenepeek`, `sandscope`, `bucephalus`, `pygmalion`, `reno-studios-com`, `mina-yu-portfolio`, `ledoit`, `movie-mash`, `college-cns`, `wall-street-beater`
+`eido`, `menhir-web`, `vantage`, `silo`, `mangaphile`, `musa`, `scenepeek`, `sandscope`, `bucephalus`, `pygmalion`, `reno-studios-com`, `mina-yu-portfolio`, `ledoit`, `movie-mash`, `college-cns`, `wall-street-beater`
