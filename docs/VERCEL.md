@@ -42,10 +42,10 @@ Vercel/GitHub are per-repo; paths below are Menhir Holdings checkout layout only
 
 | Category | Products |
 |----------|----------|
-| `Web/` | stonehenge, menhir-web, Eido, Freeze |
+| `Web/` | stonehenge, menhir-web, Eido, Freeze, Sable |
 | `Flow/` | Silo, jobjeeves, Paid, Vecchio, phrased, resumes |
 | `Visual/` | Vantage, Holo, Dawk, Mangaphile, photoport, vega |
-| `Eng/` | Augur, Sable, Kerf, Azum, Zipp |
+| `Eng/` | Augur, Kerf, Azum, Zipp |
 | `Game/` | Matrix-Maze, Diaries, Inferno, Suplex, Erudite, osrs-autoclicker |
 | `Audio/` | Kaiser (`composition/` + `console/` + `shared/`), Kithara |
 | `Color/` | Gamma, Strob, RobRoss |
