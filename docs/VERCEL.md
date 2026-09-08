@@ -45,13 +45,11 @@ Vercel/GitHub are per-repo; paths below are Menhir Holdings checkout layout only
 | `Web/` | stonehenge, menhir-web, Eido, Freeze |
 | `Flow/` | Silo, jobjeeves, Paid, Vecchio, phrased, resumes |
 | `Visual/` | Vantage, Holo, Dawk, Mangaphile, photoport, vega |
-| `Hub/` | Zipp (leftover; category TBD) |
-| `Employment/` | Azum, Kerf (leftover; category TBD) |
+| `Eng/` | Augur, Sable, Kerf, Azum, Zipp |
 | `Game/` | Matrix-Maze, Diaries, Inferno, Suplex, Erudite, osrs-autoclicker |
 | `Audio/` | Kaiser (`composition/` + `console/` + `shared/`), Kithara |
 | `Color/` | Gamma, Strob, RobRoss |
 | `Car/` | Bucephalus |
-| `FinTech/` | Augur |
 
 ## Deployment protection (SSO)
 
