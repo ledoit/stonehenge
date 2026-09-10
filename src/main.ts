@@ -1,34 +1,17 @@
 import { projects } from "./data/projects";
 import { createField } from "./scene/field";
 
-// Canonical host — prod aliases / www → menhir-holdings.com (leave PR previews alone)
-(() => {
-  const host = window.location.hostname;
-  if (host === "menhir-holdings.com") return;
-  const prodAliases = new Set([
-    "www.menhir-holdings.com",
-    "menhir-holdings.vercel.app",
-    "stonehenge-menhir-tech.vercel.app",
-    "stonehenge.vercel.app",
-  ]);
-  if (prodAliases.has(host)) {
-    const next = new URL(window.location.href);
-    next.hostname = "menhir-holdings.com";
-    next.protocol = "https:";
-    window.location.replace(next.toString());
-  }
-})();
-
 const canvas = document.querySelector<HTMLCanvasElement>("#field")!;
 const reticle = document.querySelector<HTMLElement>("#reticle");
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const hudIndex = document.querySelector<HTMLElement>("#hud-index")!;
 const hudName = document.querySelector<HTMLElement>("#hud-name")!;
 const hudTag = document.querySelector<HTMLElement>("#hud-tag")!;
+const hudEnter = document.querySelector<HTMLButtonElement>("#hud-enter")!;
 const veil = document.querySelector<HTMLElement>("#veil")!;
 const a11y = document.querySelector<HTMLUListElement>("#a11y-list")!;
 const hint = document.querySelector<HTMLElement>("#hud-hint");
-const rail = document.querySelector<HTMLElement>(".rail");
+const stoneNav = document.querySelector<HTMLElement>("#stone-nav")!;
 
 const field = createField(canvas);
 
@@ -44,6 +27,15 @@ for (const [i, p] of projects.entries()) {
   a.textContent = `${i + 1}. ${p.name} — ${p.tagline}`;
   li.appendChild(a);
   a11y.appendChild(li);
+
+  const dot = document.createElement("button");
+  dot.type = "button";
+  dot.setAttribute("aria-label", p.name);
+  dot.addEventListener("click", (e) => {
+    e.stopPropagation();
+    focusStone(i, true);
+  });
+  stoneNav.appendChild(dot);
 }
 
 function hostLabel(href: string): string {
@@ -64,6 +56,9 @@ function showHud(index: number | null) {
   hudName.textContent = p.name;
   hudTag.textContent = p.tagline;
   hud.classList.add("is-hot");
+  [...stoneNav.children].forEach((el, i) => {
+    el.classList.toggle("is-on", i === index);
+  });
 }
 
 function focusStone(index: number, face = false) {
@@ -76,12 +71,9 @@ let opening = false;
 let pointerId: number | null = null;
 let down = { x: 0, y: 0 };
 let last = { x: 0, y: 0 };
-let lastT = 0;
 let dragged = false;
-/** Recent samples for fling velocity (rad/s). */
 const samples: { t: number; x: number }[] = [];
 const DRAG_PX = mobile ? 12 : 8;
-/** Radians of ring rotation per pixel of horizontal swipe. */
 const RAD_PER_PX = (Math.PI * 2) / (Math.min(window.innerWidth, 420) * 1.15);
 
 function syncFacingHud() {
@@ -158,19 +150,20 @@ function flingVelocity(): number {
   const b = samples[samples.length - 1]!;
   const dt = (b.t - a.t) / 1000;
   if (dt < 0.012) return 0;
-  // Finger right → ring turns opposite (same as dragYaw sign)
   return -((b.x - a.x) * RAD_PER_PX) / dt;
 }
 
 if (hint) {
   hint.textContent = mobile
     ? "swipe the circle · tap to enter"
-    : "move to turn · click or enter to open";
+    : "move to turn · click or enter";
 }
-if (rail && mobile) {
-  rail.innerHTML =
-    "<span>flick to spin</span><span class=\"rail__sep\">·</span><span>tap enter</span>";
-}
+
+hudEnter.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const cur = field.getFocus() ?? field.facingIndex();
+  void openProject(cur);
+});
 
 if (reticle && !mobile) {
   const showReticle = () => reticle.classList.add("is-active");
@@ -194,9 +187,8 @@ canvas.addEventListener("pointerdown", (e) => {
   dragged = false;
   down = { x: e.clientX, y: e.clientY };
   last = { x: e.clientX, y: e.clientY };
-  lastT = performance.now();
   samples.length = 0;
-  pushSample(e.clientX, lastT);
+  pushSample(e.clientX, performance.now());
   canvas.setPointerCapture(e.pointerId);
   field.setDragging(true);
 
@@ -214,7 +206,6 @@ canvas.addEventListener("pointermove", (e) => {
     const dx = e.clientX - last.x;
     const dy = e.clientY - last.y;
     last = { x: e.clientX, y: e.clientY };
-    lastT = now;
 
     if (Math.hypot(e.clientX - down.x, e.clientY - down.y) > DRAG_PX) {
       dragged = true;
@@ -222,12 +213,10 @@ canvas.addEventListener("pointermove", (e) => {
 
     if (dragged) {
       if (mobile) {
-        // Horizontal drag turns the whole henge; vertical ignored for orbit
         field.dragYaw(-dx * RAD_PER_PX);
         pushSample(e.clientX, now);
         syncFacingHud();
       } else {
-        // Drag left (dx < 0) → yaw up → CCW, same as cursor-left look
         field.orbit(dx, dy);
         syncFacingHud();
       }
@@ -250,7 +239,6 @@ canvas.addEventListener("pointermove", (e) => {
 
 canvas.addEventListener("pointerleave", () => {
   if (mobile || pointerId !== null || opening) return;
-  // Next entry re-anchors from current camera pose (no edge snap)
   field.releaseLook();
 });
 
@@ -270,7 +258,6 @@ function endPointer(e: PointerEvent) {
     if (dragged) {
       pushSample(e.clientX, performance.now());
       field.flingYaw(flingVelocity());
-      // HUD follows during coast via rAF poll
       return;
     }
     void openProject(field.getFocus() ?? field.facingIndex());
@@ -288,7 +275,6 @@ function endPointer(e: PointerEvent) {
 canvas.addEventListener("pointerup", endPointer);
 canvas.addEventListener("pointercancel", endPointer);
 
-// Keep HUD in sync while the ring is coasting / snapping
 if (mobile) {
   const syncLoop = () => {
     if (!opening) syncFacingHud();
@@ -303,7 +289,6 @@ canvas.addEventListener(
     if (mobile || opening) return;
     e.preventDefault();
     const scale = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 40 : 1;
-    // Same CCW sense as cursor-left: scroll/drag left turns pillars right
     field.orbit(e.deltaX * scale * 1.8, e.deltaY * scale * 1.8);
     syncFacingHud();
   },

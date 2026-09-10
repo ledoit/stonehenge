@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
-# Quick DNS smoke check for Menhir product subdomains.
+# Quick DNS smoke check for leftover menhir-holdings.com records.
+# Canonical bookmarks are *.vercel.app — see docs/DNS.md.
 # Usage: ./scripts/verify-dns.sh
 
 set -euo pipefail
+
+echo "Canonical hub: https://menhir-holdings.vercel.app"
+echo "(menhir-holdings.com is unpaid; records below are leftovers.)"
+echo
 
 PRODUCTS=(
   matrix-maze strob vecchio jobjeeves paid gamma inferno vega kaiser diaries freeze

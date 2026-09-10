@@ -7,69 +7,62 @@ export type Project = {
   height: number;
 };
 
+/** Canonical hub while menhir-holdings.com is unpaid. */
+export const hubUrl = "https://menhir-holdings.vercel.app";
+
+/**
+ * Presentable lattice only — live vercel.app, complete enough to stand next to Quell.
+ * Off-circle: Kaiser (hidden), Erudite/Suplex (blank WASM), Strob/Vecchio (PartyKit +
+ * custom-domain redirects), JobJeeves (API shell), Paid (personal), Vega (parked),
+ * Vantage/Silo/Gamolingo/menhir-web (not production), shelved work.
+ */
 export const projects: Project[] = [
   {
-    id: "inferno",
-    name: "Inferno",
-    tagline: "Fight reads under motor load — OODA in the rift",
-    href: "https://inferno.menhir-holdings.com",
-    glow: "#c4f000",
-    height: 3.5,
-  },
-  {
-    id: "matrix-maze",
-    name: "Matrix Maze",
-    tagline: "A labyrinth that remembers how you move",
-    href: "https://matrix-maze.menhir-holdings.com",
-    glow: "#7ec8a3",
-    height: 3.4,
-  },
-  {
-    id: "strob",
-    name: "Strob",
-    tagline: "One pulse. Every screen. Live color for rooms",
-    href: "https://strob.menhir-holdings.com",
-    glow: "#e8a87c",
-    height: 2.9,
-  },
-  {
-    id: "vecchio",
-    name: "Vecchio",
-    tagline: "Shared text that arrives before you finish typing",
-    href: "https://vecchio.menhir-holdings.com",
-    glow: "#c4b5a0",
-    height: 3.1,
-  },
-  {
-    id: "jobjeeves",
-    name: "JobJeeves",
-    tagline: "Résumé meets role — match what actually matters",
-    href: "https://jobjeeves.menhir-holdings.com",
-    glow: "#9bb7d4",
+    id: "quell",
+    name: "Quell",
+    tagline: "OLL / PLL flashcards. One toggle, one Next.",
+    href: "https://quellcube.vercel.app",
+    glow: "#d4c4a8",
     height: 3.6,
   },
   {
-    id: "paid",
-    name: "Paid",
-    tagline: "Morning clarity for people who get things done",
-    href: "https://paid.menhir-holdings.com",
-    glow: "#d4c48c",
-    height: 2.7,
+    id: "freeze",
+    name: "Freeze",
+    tagline: "Pause every tab with one click.",
+    href: "https://freeze-lilac.vercel.app",
+    glow: "#6ec8e0",
+    height: 3.2,
   },
   {
     id: "gamma",
     name: "Gamma",
-    tagline: "Harmonic palettes cut from spectral math",
-    href: "https://gamma.menhir-holdings.com",
-    glow: "#e0a0a8",
-    height: 3.2,
+    tagline: "Harmonic palettes from spectral math.",
+    href: "https://gamma-three-lime.vercel.app",
+    glow: "#d74242",
+    height: 3.05,
   },
   {
     id: "diaries",
     name: "Diaries",
-    tagline: "Elites, UIM Secretary, stats checker — QP cape, Hards done",
-    href: "https://diaries.menhir-holdings.com",
-    glow: "#c4f000",
+    tagline: "Elite diaries, UIM Secretary, stats checker.",
+    href: "https://diaries-gray.vercel.app",
+    glow: "#d4b44a",
     height: 3.15,
+  },
+  {
+    id: "matrix-maze",
+    name: "Matrix Maze",
+    tagline: "Eight-level labyrinth. Web and desktop.",
+    href: "https://matmaz.vercel.app",
+    glow: "#4ad46a",
+    height: 3.35,
+  },
+  {
+    id: "inferno",
+    name: "Inferno",
+    tagline: "LoL fight reads under motor load.",
+    href: "https://inferno-ruby.vercel.app",
+    glow: "#ff5a1f",
+    height: 3.45,
   },
 ];

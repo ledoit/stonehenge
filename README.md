@@ -1,10 +1,14 @@
 # Menhir Holdings
 
-Repo / Vercel project: **`stonehenge`**. Public domain stays **menhir-holdings.com**.
+Repo / Vercel project: **`stonehenge`**.
 
-The apex site is not a brochure. It is a **clearing** — eight standing stones in fog. Approach one to enter a product.
+Canonical hub while the custom domain is unpaid: **https://menhir-holdings.vercel.app**
 
-**Lattice:** stones mirror [`src/data/projects.ts`](./src/data/projects.ts). Off-lattice: **Kaiser** (music console, hidden deploy), **Vega** (not on the circle yet).
+(`menhir-holdings.com` is not the bookmark. Do not redirect vercel.app hosts to it.)
+
+The apex site is a **clearing** — standing stones in fog. Approach one to enter a product. The circle is curated: only complete, live surfaces. Quell is the flagship.
+
+**Lattice:** stones mirror [`src/data/projects.ts`](./src/data/projects.ts). Off-lattice: **Kaiser** (music console, hidden deploy).
 
 **Stack:** Vite + TypeScript + Three.js (no React, no Next). Static WebGL, deployed on Vercel.
 
@@ -15,29 +19,30 @@ npm install
 npm run dev
 ```
 
+Phil tests the Vercel preview URL, not local `npm run dev`.
+
 ## Controls
 
-- Move pointer — free-look around the full stone circle
+- Move pointer — free-look around the stone circle
 - Hover / face a stone — HUD updates
-- Click or Enter — walk into the product
-- `1`–`8` / arrows — jump to a stone
+- Click, Enter, or the Enter chip — walk into the product
+- `1`–`6` / arrows / dots — jump to a stone
 
 ## Canonical URLs
 
 | Product | URL |
 |---------|-----|
-| Hub | https://menhir-holdings.com |
-| Inferno | https://inferno.menhir-holdings.com |
-| Matrix Maze | https://matrix-maze.menhir-holdings.com |
-| Strob | https://strob.menhir-holdings.com |
-| Vecchio | https://vecchio.menhir-holdings.com |
-| JobJeeves | https://jobjeeves.menhir-holdings.com |
-| Paid | https://paid.menhir-holdings.com |
-| Gamma | https://gamma.menhir-holdings.com |
-| Diaries | https://diaries.menhir-holdings.com |
+| Hub | https://menhir-holdings.vercel.app |
+| Quell | https://quellcube.vercel.app |
+| Freeze | https://freeze-lilac.vercel.app |
+| Gamma | https://gamma-three-lime.vercel.app |
+| Diaries | https://diaries-gray.vercel.app |
+| Matrix Maze | https://matmaz.vercel.app |
+| Inferno | https://inferno-ruby.vercel.app |
+
+Off-circle (not presentable as a public stone): Kaiser (`kaiser-mu.vercel.app`).
 
 See [docs/DNS.md](./docs/DNS.md) and [docs/VERCEL.md](./docs/VERCEL.md).
-
 
 ## License
 

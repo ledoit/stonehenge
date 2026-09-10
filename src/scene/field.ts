@@ -79,31 +79,6 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   ground.position.y = 0.01;
   scene.add(ground);
 
-  const brandGeo = new THREE.PlaneGeometry(18, 4.5);
-  const brandCanvas = document.createElement("canvas");
-  brandCanvas.width = 2048;
-  brandCanvas.height = 512;
-  const ctx = brandCanvas.getContext("2d")!;
-  ctx.clearRect(0, 0, 2048, 512);
-  ctx.fillStyle = "rgba(231, 225, 212, 0.07)";
-  ctx.font = "800 280px Syne, sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("MENHIR", 1024, 260);
-  const brandTex = new THREE.CanvasTexture(brandCanvas);
-  brandTex.colorSpace = THREE.SRGBColorSpace;
-  const brand = new THREE.Mesh(
-    brandGeo,
-    new THREE.MeshBasicMaterial({
-      map: brandTex,
-      transparent: true,
-      depthWrite: false,
-      opacity: 1,
-    }),
-  );
-  brand.position.set(0, 5.5, -10);
-  scene.add(brand);
-
   const stones = projects.map((p, i) => createStone(p, i, projects.length));
   for (const s of stones) scene.add(s.group);
 
@@ -263,13 +238,11 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
       fog.density = 0.038;
       targetPitch = 0.12;
       pitch = 0.12;
-      brand.position.set(0, 6.2, -12);
     } else {
       camR = 11.5;
       camYBase = 3.2;
       camera.fov = 42;
       fog.density = 0.055;
-      brand.position.set(0, 5.5, -10);
     }
     camera.updateProjectionMatrix();
   }
@@ -379,7 +352,6 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
       s.group.scale.setScalar(1 + hot * 0.03);
     }
 
-    brand.rotation.y = Math.sin(t * 0.08) * 0.04;
     renderer.render(scene, camera);
   }
 
