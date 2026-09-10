@@ -2,7 +2,7 @@
   --fog: #12140f;
   --bone: #f0ebe0;
   --ash: #c2bbb0;
-  --lichen: #e0b85a;
+  --lichen: #d4c4a8;
   --dim: #8a8478;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,7 +24,7 @@ body {
   overflow: hidden;
   background: var(--fog);
   color: var(--bone);
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-family: Outfit, ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
@@ -66,11 +66,11 @@ body {
   pointer-events: none;
   z-index: 20;
   background: radial-gradient(
-    ellipse 77% 64% at 50% 42%,
+    ellipse 80% 62% at 50% 46%,
     transparent 0%,
-    transparent 55%,
-    rgba(18, 20, 15, 0.19) 78%,
-    rgba(18, 20, 15, 0.59) 100%
+    transparent 52%,
+    rgba(18, 20, 15, 0.22) 78%,
+    rgba(18, 20, 15, 0.62) 100%
   );
   opacity: 1;
   transition: background 0.8s ease;
@@ -83,133 +83,106 @@ body {
 
 .mast {
   position: fixed;
-  top: clamp(1.25rem, 4vh, 2.5rem);
-  left: clamp(1.25rem, 4vw, 2.75rem);
+  top: clamp(0.4rem, 1.8vh, 1.1rem);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
-  max-width: min(28rem, 86vw);
   pointer-events: none;
+  width: min(96vw, 72rem);
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.mast__brand {
+  font-family: Outfit, ui-sans-serif, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: clamp(2.6rem, 9vw, 6.2rem);
+  letter-spacing: -0.06em;
+  line-height: 0.82;
+  color: var(--bone);
+}
+
+.hud {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(2.1rem, 7vh, 3.6rem);
+  transform: translateX(-50%) translateY(0.6rem);
+  z-index: 10;
+  width: min(32rem, calc(100vw - 2rem));
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   text-shadow:
     0 1px 2px rgba(0, 0, 0, 0.55),
     0 8px 28px rgba(0, 0, 0, 0.35);
 }
 
-.mast__sigil {
-  font-size: 0.75rem;
-  letter-spacing: 0.35em;
-  color: var(--lichen);
-  margin-bottom: 0.75rem;
-}
-
-.mast__brand {
-  font-family: Syne, system-ui, sans-serif;
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.04em;
-  font-size: clamp(2.6rem, 9vw, 5.5rem);
-  text-transform: uppercase;
-  color: var(--bone);
-}
-
-.mast__word {
-  display: block;
-}
-
-.mast__hold {
-  display: block;
-  color: color-mix(in oklab, var(--bone) 78%, var(--ash));
-  font-weight: 700;
-  letter-spacing: -0.03em;
-}
-
-.mast__line {
-  margin-top: 1rem;
-  max-width: 24rem;
-  font-size: 0.78rem;
-  line-height: 1.6;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ash);
-}
-
-.hud {
-  position: fixed;
-  left: clamp(1.25rem, 4vw, 2.75rem);
-  bottom: clamp(3.5rem, 10vh, 5.5rem);
-  z-index: 10;
-  max-width: min(28rem, 90vw);
-  padding: 1rem 1.15rem 1.1rem;
-  border-left: 2px solid color-mix(in oklab, var(--lichen) 70%, transparent);
-  background: linear-gradient(
-    90deg,
-    rgba(12, 14, 10, 0.72) 0%,
-    rgba(12, 14, 10, 0.35) 70%,
-    transparent 100%
-  );
-  opacity: 0;
-  transform: translateY(1rem);
-  transition:
-    opacity 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-  pointer-events: none;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
 .hud.is-hot {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
 }
 
 .hud__index {
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: var(--lichen);
   margin-bottom: 0.45rem;
-  word-break: break-all;
 }
 
 .hud__name {
-  font-family: Syne, system-ui, sans-serif;
-  font-weight: 700;
-  font-size: clamp(2rem, 5.5vw, 3.15rem);
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  font-family: Outfit, ui-sans-serif, sans-serif;
+  font-weight: 600;
+  font-size: clamp(2.4rem, 7vw, 4.2rem);
+  letter-spacing: -0.04em;
+  line-height: 1.02;
   color: var(--bone);
 }
 
 .hud__tag {
-  margin-top: 0.7rem;
-  font-size: 0.92rem;
-  line-height: 1.5;
+  margin: 0.55rem auto 0;
+  max-width: 22rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
   color: var(--ash);
-  max-width: 24rem;
 }
 
-.hud__hint {
-  margin-top: 0.95rem;
-  font-size: 0.68rem;
+.hud__enter {
+  pointer-events: auto;
+  cursor: pointer;
+  margin-top: 1.05rem;
+  padding: 0.45rem 1.15rem;
+  border: 1px solid color-mix(in oklab, var(--bone) 28%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--fog) 55%, transparent);
+  color: var(--bone);
+  font: 500 0.72rem/1 Outfit, ui-sans-serif, sans-serif;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--dim);
+  backdrop-filter: blur(8px);
+}
+
+.hud__enter:hover,
+.hud__enter:focus-visible {
+  border-color: color-mix(in oklab, var(--bone) 70%, transparent);
+  outline: none;
 }
 
 .rail {
   position: fixed;
   right: clamp(1rem, 3vw, 2rem);
-  bottom: clamp(1rem, 3vh, 1.75rem);
+  bottom: clamp(0.7rem, 2.2vh, 1.4rem);
   z-index: 10;
-  display: flex;
-  gap: 0.55rem;
-  align-items: center;
   font-size: 0.65rem;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--dim);
   pointer-events: none;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-}
-
-.rail__sep {
-  opacity: 0.45;
 }
 
 .sr-only {
@@ -234,46 +207,26 @@ body {
   }
 
   .mast {
-    top: max(1rem, env(safe-area-inset-top));
-    left: 1rem;
-    right: 1rem;
-    max-width: none;
+    top: max(0.35rem, env(safe-area-inset-top));
   }
 
   .mast__brand {
-    font-size: clamp(2rem, 11vw, 2.8rem);
-  }
-
-  .mast__line {
-    font-size: 0.68rem;
-    letter-spacing: 0.05em;
-  }
-
-  .rail {
-    display: flex;
-    left: 1rem;
-    right: auto;
-    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    font-size: clamp(2.4rem, 16vw, 4.4rem);
   }
 
   .hud {
-    left: 0;
-    right: 0;
-    bottom: max(2.75rem, calc(env(safe-area-inset-bottom) + 2.5rem));
-    max-width: none;
-    margin: 0 0.75rem;
-    padding: 0.9rem 1rem 1rem;
-    border-left: none;
-    border-top: 2px solid color-mix(in oklab, var(--lichen) 70%, transparent);
-    background: linear-gradient(
-      180deg,
-      rgba(12, 14, 10, 0.82) 0%,
-      rgba(12, 14, 10, 0.55) 100%
-    );
+    bottom: max(2.4rem, calc(env(safe-area-inset-bottom) + 2.2rem));
   }
 
   .hud__name {
-    font-size: clamp(1.75rem, 8vw, 2.4rem);
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .rail {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
 }
 

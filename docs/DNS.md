@@ -1,55 +1,45 @@
-# DNS — menhir-holdings.com (Cloudflare)
+# DNS — menhir-holdings.com (unpaid)
 
-Leave **Zoho Mail** alone: MX, SPF, DKIM, `zb04905990` — always **DNS only** (grey cloud).
+**Canonical hub URL:** https://menhir-holdings.vercel.app
 
-**Canonical hub URL:** `https://menhir-holdings.com` (apex, no `www`).  
-`www`, `stonehenge-menhir-tech.vercel.app`, and legacy `menhir-holdings.vercel.app` should redirect there.
+The custom domain is **not paid**. Do not redirect `menhir-holdings.vercel.app` (or other Vercel aliases) to `menhir-holdings.com`. Leave PR preview hosts alone.
 
-(`stonehenge.vercel.app` is taken outside this team — use the `*-menhir-tech` alias.)
+If leftover Cloudflare records still resolve `*.menhir-holdings.com` to Vercel, treat that as accident, not the bookmark.
 
+Leave **Zoho Mail** alone if those records still exist: MX, SPF, DKIM, `zb04905990` — always **DNS only** (grey cloud).
 
-Proxy column = Cloudflare **DNS only** (grey cloud) until certs are green. Optional orange-cloud later with SSL = **Full (strict)**.
+## When a domain is paid again
 
-## Hub (update to Vercel’s new target)
-
-Vercel’s IP expansion: prefer the project-specific CNAME below. Old `A 76.76.21.21` / `cname.vercel-dns.com` still work but are legacy.
+Prefer the project-specific Vercel CNAME target from the Domains screen (often `*.vercel-dns-017.com`). Cloudflare supports CNAME on `@` (CNAME flattening).
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
-| CNAME | `@` | `3b1305dd97e170ad.vercel-dns-017.com` | DNS only |
-| CNAME | `www` | `3b1305dd97e170ad.vercel-dns-017.com` | DNS only |
+| CNAME | `@` | Vercel project DNS target | DNS only |
+| CNAME | `www` | same | DNS only |
 
-Cloudflare supports CNAME on `@` (CNAME flattening). If you still have `A @ → 76.76.21.21`, **replace** it with the CNAME above.
+Then: apex = hub, `www` → apex, product subdomains → each Vercel project. Until then, product stones use `*.vercel.app` aliases in [`src/data/projects.ts`](../src/data/projects.ts).
 
-## Product subdomains
+## Product aliases (current)
 
-If a product’s Vercel Domains screen shows a **new** `*.vercel-dns-017.com` target, use that. Otherwise `cname.vercel-dns.com` is fine until Vercel prompts you.
+| Product | Bookmark |
+|---------|----------|
+| Hub | https://menhir-holdings.vercel.app |
+| Quell | https://quellcube.vercel.app |
+| Freeze | https://freeze-lilac.vercel.app |
+| Gamma | https://gamma-three-lime.vercel.app |
+| Strob | https://strob-menhir-holdings.vercel.app |
+| Vecchio | https://vecchio-menhir-holdings.vercel.app |
+| Paid | https://paid-menhir-holdings.vercel.app |
+| Matrix Maze | https://matmaz.vercel.app |
+| Inferno | https://inferno-ruby.vercel.app |
+| Kaiser (hidden) | https://kaiser-mu.vercel.app |
 
-| Type | Name | Content | Proxy |
-|------|------|---------|-------|
-| CNAME | `matrix-maze` | `cname.vercel-dns.com` *(or Vercel’s shown target)* | DNS only |
-| CNAME | `strob` | same | DNS only |
-| CNAME | `vecchio` | same | DNS only |
-| CNAME | `jobjeeves` | same | DNS only |
-| CNAME | `paid` | same | DNS only |
-| CNAME | `gamma` | same | DNS only |
-| CNAME | `inferno` | same | DNS only |
-| CNAME | `vega` | same | DNS only |
-| CNAME | `kaiser` | same | DNS only |
-| CNAME | `diaries` | same | DNS only |
-| CNAME | `freeze` | `cname.vercel-dns.com` *(or Vercel’s shown target)* | DNS only |
-
-## Remove
-
-| Action | Name |
-|--------|------|
-| Delete CNAME | `syncstation` |
+Do not 308 product `*.vercel.app` hosts to unpaid `{product}.menhir-holdings.com`.
 
 ## Redirects
 
 | From | To |
-|------|-----|
-| `www.menhir-holdings.com` | `https://menhir-holdings.com` |
-| `stonehenge-menhir-tech.vercel.app` | `https://menhir-holdings.com` |
-| `menhir-holdings.vercel.app` (legacy) | `https://menhir-holdings.com` |
-| `{product}.vercel.app` | `https://{product}.menhir-holdings.com` |
+|------|----|
+| none | vercel.app hub is canonical |
+
+Do not restore `menhir-holdings.vercel.app` → `menhir-holdings.com` until the domain is paid and certs are green.
