@@ -11,12 +11,10 @@ const hudEnter = document.querySelector<HTMLButtonElement>("#hud-enter")!;
 const veil = document.querySelector<HTMLElement>("#veil")!;
 const a11y = document.querySelector<HTMLUListElement>("#a11y-list")!;
 const hint = document.querySelector<HTMLElement>("#hud-hint");
-const stoneNav = document.querySelector<HTMLElement>("#stone-nav")!;
 
 const field = createField(canvas);
 
-const mobile =
-  window.matchMedia("(max-width: 720px), (pointer: coarse)").matches;
+const mobile = window.matchMedia("(max-width: 720px), (pointer: coarse)").matches;
 
 if (mobile) field.setCompactFraming(true);
 
@@ -27,15 +25,6 @@ for (const [i, p] of projects.entries()) {
   a.textContent = `${i + 1}. ${p.name} — ${p.tagline}`;
   li.appendChild(a);
   a11y.appendChild(li);
-
-  const dot = document.createElement("button");
-  dot.type = "button";
-  dot.setAttribute("aria-label", p.name);
-  dot.addEventListener("click", (e) => {
-    e.stopPropagation();
-    focusStone(i, true);
-  });
-  stoneNav.appendChild(dot);
 }
 
 function hostLabel(href: string): string {
@@ -56,15 +45,25 @@ function showHud(index: number | null) {
   hudName.textContent = p.name;
   hudTag.textContent = p.tagline;
   hud.classList.add("is-hot");
-  [...stoneNav.children].forEach((el, i) => {
-    el.classList.toggle("is-on", i === index);
-  });
 }
 
-function focusStone(index: number, face = false) {
-  if (face) field.faceStone(index);
-  else field.setFocus(index);
+function syncHud() {
+  showHud(field.getPresented() ?? field.getFocus());
+}
+
+function hoverPiece(index: number | null) {
+  if (field.getPresented() !== null) {
+    field.setFocus(index ?? field.getPresented());
+    return;
+  }
+  field.setFocus(index);
   showHud(index);
+}
+
+function presentPiece(index: number | null) {
+  field.present(index);
+  if (index !== null) field.setFocus(index);
+  syncHud();
 }
 
 let opening = false;
@@ -72,27 +71,16 @@ let pointerId: number | null = null;
 let down = { x: 0, y: 0 };
 let last = { x: 0, y: 0 };
 let dragged = false;
-const samples: { t: number; x: number }[] = [];
 const DRAG_PX = mobile ? 12 : 8;
-const RAD_PER_PX = (Math.PI * 2) / (Math.min(window.innerWidth, 420) * 1.15);
-
-function syncFacingHud() {
-  const idx = field.facingIndex();
-  if (field.getFocus() !== idx) {
-    field.setFocus(idx);
-    showHud(idx);
-  }
-}
 
 function restoreFromExit() {
   opening = false;
   pointerId = null;
   dragged = false;
-  samples.length = 0;
   veil.classList.remove("is-entering");
   field.abortEnter();
-  const idx = field.getFocus() ?? field.facingIndex();
-  focusStone(idx, true);
+  const idx = field.getPresented() ?? field.getFocus();
+  presentPiece(idx);
   field.renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
@@ -113,7 +101,7 @@ window.addEventListener("pagehide", () => {
 async function openProject(index: number) {
   if (opening) return;
   opening = true;
-  focusStone(index, true);
+  presentPiece(index);
   veil.classList.add("is-entering");
   try {
     await field.enter(index);
@@ -133,36 +121,20 @@ function pointerNorm(e: PointerEvent) {
   };
 }
 
-function stepStone(dir: 1 | -1) {
-  const cur = field.getFocus() ?? field.facingIndex();
+function stepPiece(dir: 1 | -1) {
+  const cur = field.getPresented() ?? field.getFocus() ?? 0;
   const next = (cur + dir + projects.length) % projects.length;
-  focusStone(next, true);
-}
-
-function pushSample(x: number, t: number) {
-  samples.push({ x, t });
-  while (samples.length > 6) samples.shift();
-}
-
-function flingVelocity(): number {
-  if (samples.length < 2) return 0;
-  const a = samples[0]!;
-  const b = samples[samples.length - 1]!;
-  const dt = (b.t - a.t) / 1000;
-  if (dt < 0.012) return 0;
-  return -((b.x - a.x) * RAD_PER_PX) / dt;
+  presentPiece(next);
 }
 
 if (hint) {
-  hint.textContent = mobile
-    ? "swipe the circle · tap to enter"
-    : "move to turn · click or enter";
+  hint.textContent = mobile ? "tap an object · enter" : "click an object · enter";
 }
 
 hudEnter.addEventListener("click", (e) => {
   e.stopPropagation();
-  const cur = field.getFocus() ?? field.facingIndex();
-  void openProject(cur);
+  const cur = field.getPresented() ?? field.getFocus();
+  if (cur !== null) void openProject(cur);
 });
 
 if (reticle && !mobile) {
@@ -187,22 +159,14 @@ canvas.addEventListener("pointerdown", (e) => {
   dragged = false;
   down = { x: e.clientX, y: e.clientY };
   last = { x: e.clientX, y: e.clientY };
-  samples.length = 0;
-  pushSample(e.clientX, performance.now());
   canvas.setPointerCapture(e.pointerId);
   field.setDragging(true);
-
-  if (!mobile) {
-    const hit = field.pick(e.clientX, e.clientY);
-    if (hit !== null) focusStone(hit);
-  }
 });
 
 canvas.addEventListener("pointermove", (e) => {
   if (opening) return;
 
   if (pointerId === e.pointerId) {
-    const now = performance.now();
     const dx = e.clientX - last.x;
     const dy = e.clientY - last.y;
     last = { x: e.clientX, y: e.clientY };
@@ -212,14 +176,7 @@ canvas.addEventListener("pointermove", (e) => {
     }
 
     if (dragged) {
-      if (mobile) {
-        field.dragYaw(-dx * RAD_PER_PX);
-        pushSample(e.clientX, now);
-        syncFacingHud();
-      } else {
-        field.orbit(dx, dy);
-        syncFacingHud();
-      }
+      field.orbit(dx, dy);
     }
     return;
   }
@@ -230,16 +187,13 @@ canvas.addEventListener("pointermove", (e) => {
   field.setLook(nx, ny);
 
   const hit = field.pick(e.clientX, e.clientY);
-  if (hit !== null) {
-    focusStone(hit);
-  } else {
-    syncFacingHud();
-  }
+  hoverPiece(hit);
 });
 
 canvas.addEventListener("pointerleave", () => {
   if (mobile || pointerId !== null || opening) return;
   field.releaseLook();
+  if (field.getPresented() === null) hoverPiece(null);
 });
 
 function endPointer(e: PointerEvent) {
@@ -254,34 +208,29 @@ function endPointer(e: PointerEvent) {
 
   if (opening) return;
 
-  if (mobile) {
-    if (dragged) {
-      pushSample(e.clientX, performance.now());
-      field.flingYaw(flingVelocity());
-      return;
-    }
-    void openProject(field.getFocus() ?? field.facingIndex());
+  if (dragged) {
+    field.releaseLook();
     return;
   }
 
-  if (!dragged) {
-    const hit = field.pick(e.clientX, e.clientY) ?? field.getFocus() ?? field.facingIndex();
-    void openProject(hit);
-  } else {
-    syncFacingHud();
+  const hit = field.pick(e.clientX, e.clientY);
+  const current = field.getPresented();
+
+  if (hit === null) {
+    presentPiece(null);
+    return;
   }
+
+  if (hit === current) {
+    void openProject(hit);
+    return;
+  }
+
+  presentPiece(hit);
 }
 
 canvas.addEventListener("pointerup", endPointer);
 canvas.addEventListener("pointercancel", endPointer);
-
-if (mobile) {
-  const syncLoop = () => {
-    if (!opening) syncFacingHud();
-    requestAnimationFrame(syncLoop);
-  };
-  requestAnimationFrame(syncLoop);
-}
 
 canvas.addEventListener(
   "wheel",
@@ -290,7 +239,6 @@ canvas.addEventListener(
     e.preventDefault();
     const scale = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 40 : 1;
     field.orbit(e.deltaX * scale * 1.8, e.deltaY * scale * 1.8);
-    syncFacingHud();
   },
   { passive: false },
 );
@@ -299,21 +247,25 @@ window.addEventListener("keydown", (e) => {
   if (opening) return;
 
   if (e.key >= "1" && e.key <= String(projects.length)) {
-    focusStone(Number(e.key) - 1, true);
+    presentPiece(Number(e.key) - 1);
     return;
   }
 
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
     e.preventDefault();
-    stepStone(e.key === "ArrowRight" ? 1 : -1);
+    stepPiece(e.key === "ArrowRight" ? 1 : -1);
+    return;
+  }
+
+  if (e.key === "Escape") {
+    presentPiece(null);
     return;
   }
 
   if (e.key === "Enter" || e.key === " ") {
-    const cur = field.getFocus() ?? field.facingIndex();
+    const cur = field.getPresented() ?? field.getFocus();
+    if (cur === null) return;
     e.preventDefault();
     void openProject(cur);
   }
 });
-
-focusStone(0, true);

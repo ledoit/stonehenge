@@ -1,43 +1,49 @@
 import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { projects } from "../data/projects";
-import { createStone, type MenhirStone } from "./stone";
+import { createPiece, type StudioPiece } from "./piece";
 import { groundFragment, groundVertex } from "./shaders";
 
 export type FieldApi = {
-  stones: MenhirStone[];
+  pieces: StudioPiece[];
   camera: THREE.PerspectiveCamera;
   renderer: THREE.WebGLRenderer;
   scene: THREE.Scene;
   setFocus: (index: number | null) => void;
   getFocus: () => number | null;
+  present: (index: number | null) => void;
+  getPresented: () => number | null;
   pick: (x: number, y: number) => number | null;
   setLook: (nx: number, ny: number) => void;
-  /** Drop look-mode anchor so the next pointer entry re-bases smoothly. */
   releaseLook: () => void;
   setDragging: (dragging: boolean) => void;
   orbit: (dx: number, dy: number) => void;
-  /** Mobile: rotate ring by radians while finger is down. */
-  dragYaw: (deltaRad: number) => void;
-  /** Mobile: release with angular velocity (rad/s); coasts then snaps. */
-  flingYaw: (velocityRadPerSec: number) => void;
-  faceStone: (index: number) => void;
-  facingIndex: () => number;
-  /** Pull camera back / widen FOV so the full circle reads on a phone. */
   setCompactFraming: (on: boolean) => void;
   enter: (index: number) => Promise<void>;
   abortEnter: () => void;
   dispose: () => void;
 };
 
-function stoneYaw(stone: MenhirStone): number {
-  return Math.atan2(stone.group.position.z, stone.group.position.x);
-}
-
-function angleDelta(a: number, b: number): number {
-  let d = a - b;
-  while (d > Math.PI) d -= Math.PI * 2;
-  while (d < -Math.PI) d += Math.PI * 2;
-  return d;
+function roundedPlate(w: number, d: number, r: number, depth: number): THREE.ExtrudeGeometry {
+  const s = new THREE.Shape();
+  const x = -w / 2;
+  const y = -d / 2;
+  s.moveTo(x + r, y);
+  s.lineTo(x + w - r, y);
+  s.absarc(x + w - r, y + r, r, -Math.PI / 2, 0, false);
+  s.lineTo(x + w, y + d - r);
+  s.absarc(x + w - r, y + d - r, r, 0, Math.PI / 2, false);
+  s.lineTo(x + r, y + d);
+  s.absarc(x + r, y + d - r, r, Math.PI / 2, Math.PI, false);
+  s.lineTo(x, y + r);
+  s.absarc(x + r, y + r, r, Math.PI, Math.PI * 1.5, false);
+  return new THREE.ExtrudeGeometry(s, {
+    depth,
+    bevelEnabled: true,
+    bevelThickness: 0.035,
+    bevelSize: 0.045,
+    bevelSegments: 2,
+  });
 }
 
 export function createField(canvas: HTMLCanvasElement): FieldApi {
@@ -51,20 +57,47 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x12140f, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.12;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x12140f, 0.055);
+  scene.fog = new THREE.FogExp2(0x12140f, 0.024);
+  scene.background = new THREE.Color(0x12140f);
 
-  const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 80);
-  camera.position.set(0, 3.2, 11.5);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const env = new RoomEnvironment();
+  scene.environment = pmrem.fromScene(env, 0.05).texture;
+  scene.environmentIntensity = 0.62;
+  env.dispose();
+  pmrem.dispose();
 
-  const hemi = new THREE.HemisphereLight(0xb8c4a8, 0x1a1812, 0.85);
+  const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 80);
+  camera.position.set(0, 6.4, 10.6);
+
+  const hemi = new THREE.HemisphereLight(0xb8c4a8, 0x16140f, 0.58);
   scene.add(hemi);
-  const key = new THREE.DirectionalLight(0xfff2d6, 0.55);
-  key.position.set(4, 10, 6);
+
+  const key = new THREE.DirectionalLight(0xfff1dc, 1.85);
+  key.position.set(5.2, 8.4, 4.2);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.camera.near = 1;
+  key.shadow.camera.far = 28;
+  key.shadow.camera.left = -7;
+  key.shadow.camera.right = 7;
+  key.shadow.camera.top = 7;
+  key.shadow.camera.bottom = -7;
+  key.shadow.bias = -0.00035;
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0x6a8a9a, 0.25);
-  rim.position.set(-6, 3, -4);
+
+  const fill = new THREE.DirectionalLight(0x6a8aaa, 0.32);
+  fill.position.set(-5, 3.2, 2.4);
+  scene.add(fill);
+
+  const rim = new THREE.DirectionalLight(0x445566, 0.4);
+  rim.position.set(-2.2, 5.5, -6);
   scene.add(rim);
 
   const groundMat = new THREE.ShaderMaterial({
@@ -72,36 +105,67 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     fragmentShader: groundFragment,
     transparent: true,
     depthWrite: false,
-    uniforms: { uTime: { value: 0 } },
   });
-  const ground = new THREE.Mesh(new THREE.CircleGeometry(24, 64), groundMat);
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(22, 64), groundMat);
   ground.rotation.x = -Math.PI / 2;
-  ground.position.y = 0.01;
+  ground.position.y = -1.2;
   scene.add(ground);
 
-  const stones = projects.map((p, i) => createStone(p, i, projects.length));
-  for (const s of stones) scene.add(s.group);
+  const plateMat = new THREE.MeshStandardMaterial({
+    color: 0x3e4138,
+    roughness: 0.78,
+    metalness: 0.06,
+    envMapIntensity: 0.45,
+  });
+  const plate = new THREE.Mesh(roundedPlate(7.05, 4.55, 0.48, 0.16), plateMat);
+  plate.rotation.x = -Math.PI / 2;
+  plate.position.y = -0.16;
+  plate.receiveShadow = true;
+  scene.add(plate);
 
-  let camR = 11.5;
-  let camYBase = 3.2;
+  const lipMat = new THREE.MeshStandardMaterial({
+    color: 0x6a604c,
+    roughness: 0.42,
+    metalness: 0.48,
+    envMapIntensity: 0.7,
+  });
+  const lip = new THREE.Mesh(roundedPlate(7.32, 4.82, 0.52, 0.12), lipMat);
+  lip.rotation.x = -Math.PI / 2;
+  lip.position.y = -0.22;
+  lip.receiveShadow = true;
+  lip.castShadow = true;
+  scene.add(lip);
+
+  const riserMat = new THREE.MeshStandardMaterial({
+    color: 0x1c1e19,
+    roughness: 0.88,
+    metalness: 0.03,
+  });
+  const riser = new THREE.Mesh(roundedPlate(6.35, 3.95, 0.34, 0.55), riserMat);
+  riser.rotation.x = -Math.PI / 2;
+  riser.position.y = -0.78;
+  riser.receiveShadow = true;
+  riser.castShadow = true;
+  scene.add(riser);
+
+  const pieces = projects.map((p, i) => createPiece(p, i));
+  for (const p of pieces) scene.add(p.group);
+
+  let camR = 10.6;
+  let camYBase = 6.4;
   const fog = scene.fog as THREE.FogExp2;
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let focus: number | null = null;
+  let presented: number | null = null;
   let dragging = false;
-  let yaw = stoneYaw(stones[0]!);
-  let pitch = 0;
-  let targetYaw = yaw;
-  let targetPitch = 0;
-  let lookMode = true;
-  /** Cursor pose when lookMode engaged — relative look avoids snap from profile. */
-  let lookOriginNx = 0;
-  let lookOriginNy = 0;
-  let lookBaseYaw = 0;
-  let lookBasePitch = 0;
-  let yawVel = 0;
-  let coasting = false;
+  let yaw = Math.PI * 0.5 + 0.28;
+  let pitch = 0.06;
+  let orbitYaw = yaw;
+  let orbitPitch = pitch;
+  let lookYaw = 0;
+  let lookPitch = 0;
   let entering = false;
   let enterT = 0;
   let enterResolve: (() => void) | null = null;
@@ -112,9 +176,11 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   const clock = new THREE.Clock();
   const reduced =
     typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const SNAP_VEL = 0.35; // rad/s — below this, settle onto nearest stone
-  const FRICTION = 3.2; // exponential decay rate
+  const lookTarget = new THREE.Vector3(0, 0.42, 0);
+  const lookDesired = new THREE.Vector3(0, 0.42, 0);
+  const toward = new THREE.Vector3();
+  const hotTarget = new THREE.Vector3();
+  const camPos = new THREE.Vector3();
 
   function setFocus(index: number | null) {
     focus = index;
@@ -124,37 +190,13 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     return focus;
   }
 
-  function facingFrom(angle: number): number {
-    let best = 0;
-    let bestAbs = Infinity;
-    for (const s of stones) {
-      const d = Math.abs(angleDelta(stoneYaw(s), angle));
-      if (d < bestAbs) {
-        bestAbs = d;
-        best = s.index;
-      }
-    }
-    return best;
+  function present(index: number | null) {
+    presented = index;
+    if (index !== null) focus = index;
   }
 
-  function facingIndex(): number {
-    return facingFrom(yaw);
-  }
-
-  function faceStone(index: number) {
-    lookMode = false;
-    coasting = false;
-    yawVel = 0;
-    targetYaw = stoneYaw(stones[index]!);
-    // Keep a calm profile pitch when locking to a stone
-    targetPitch = THREE.MathUtils.clamp(targetPitch * 0.35, -0.2, 0.25);
-    setFocus(index);
-  }
-
-  function snapToNearest() {
-    const idx = facingFrom(targetYaw);
-    faceStone(idx);
-    return idx;
+  function getPresented() {
+    return presented;
   }
 
   function pick(clientX: number, clientY: number): number | null {
@@ -163,7 +205,7 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(
-      stones.map((s) => s.mesh),
+      pieces.flatMap((p) => p.pickables),
       false,
     );
     if (!hits.length) return null;
@@ -171,78 +213,40 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   }
 
   function setLook(nx: number, ny: number) {
-    if (dragging || entering || coasting) return;
-    // First move after profile / orbit: anchor here so we never snap to absolute screen map
-    if (!lookMode) {
-      lookMode = true;
-      lookOriginNx = nx;
-      lookOriginNy = ny;
-      lookBaseYaw = yaw;
-      lookBasePitch = pitch;
-    }
-    yawVel = 0;
-    const dnx = nx - lookOriginNx;
-    const dny = ny - lookOriginNy;
-    // Cursor left → yaw up → ring turns counterclockwise (pillars move right)
-    targetYaw = lookBaseYaw - dnx * Math.PI;
-    targetPitch = THREE.MathUtils.clamp(lookBasePitch - dny * 0.32 * 7, -1.4, 1.4);
+    if (dragging || entering) return;
+    lookYaw = -nx * 0.38;
+    lookPitch = THREE.MathUtils.clamp(-ny * 0.16, -0.2, 0.2);
   }
 
   function releaseLook() {
-    lookMode = false;
+    lookYaw = 0;
+    lookPitch = 0;
   }
 
   function orbit(dx: number, dy: number) {
-    lookMode = false;
-    coasting = false;
-    yawVel = 0;
-    // Drag/scroll left (dx < 0) → yaw increases → same CCW sense as setLook
-    targetYaw -= dx * 0.0055;
-    targetPitch = THREE.MathUtils.clamp(targetPitch - dy * 0.0035 * 7, -1.4, 1.4);
-  }
-
-  function dragYaw(deltaRad: number) {
-    lookMode = false;
-    coasting = false;
-    yawVel = 0;
-    targetYaw += deltaRad;
-    // Keep visual yaw tight to the finger while dragging
-    yaw += deltaRad;
-  }
-
-  function flingYaw(velocityRadPerSec: number) {
-    lookMode = false;
-    const v = THREE.MathUtils.clamp(velocityRadPerSec, -14, 14);
-    if (Math.abs(v) < SNAP_VEL) {
-      snapToNearest();
-      return;
-    }
-    yawVel = v;
-    coasting = true;
+    orbitYaw -= dx * 0.0048;
+    orbitPitch = THREE.MathUtils.clamp(orbitPitch - dy * 0.0032, -0.12, 0.55);
   }
 
   function setDragging(value: boolean) {
     dragging = value;
     if (value) {
-      lookMode = false;
-      coasting = false;
-      yawVel = 0;
+      lookYaw = 0;
+      lookPitch = 0;
     }
   }
 
   function setCompactFraming(on: boolean) {
     if (on) {
-      camR = 15.4;
-      camYBase = 4.35;
-      camera.fov = 56;
-      fog.density = 0.038;
-      targetPitch = 0.12;
-      pitch = 0.12;
+      camR = 13.4;
+      camYBase = 8.4;
+      camera.fov = 46;
+      fog.density = 0.02;
     } else {
-      camR = 11.5;
-      camYBase = 3.2;
-      camera.fov = 42;
-      fog.density = 0.055;
+      camR = 10.6;
+      camYBase = 6.4;
+      camera.fov = 34;
+      fog.density = 0.024;
     }
     camera.updateProjectionMatrix();
   }
@@ -250,19 +254,13 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   function enter(index: number): Promise<void> {
     entering = true;
     enterT = 0;
-    coasting = false;
-    yawVel = 0;
-    faceStone(index);
+    present(index);
 
-    const stone = stones[index]!;
-    stone.mesh.getWorldPosition(enterLook);
-    enterLook.y += stone.project.height * 0.28;
-
-    const outward = new THREE.Vector3(stone.group.position.x, 0, stone.group.position.z)
-      .normalize()
-      .multiplyScalar(2.6);
-    enterTo.copy(enterLook).add(outward);
-    enterTo.y = Math.max(enterTo.y, 2.2);
+    const piece = pieces[index]!;
+    piece.group.getWorldPosition(enterLook);
+    enterLook.y += 0.45;
+    toward.copy(camera.position).sub(enterLook).normalize();
+    enterTo.copy(enterLook).addScaledVector(toward, 1.65);
     enterFrom.copy(camera.position);
 
     return new Promise((resolve) => {
@@ -277,61 +275,53 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     }
     entering = false;
     enterT = 0;
-    coasting = false;
-    yawVel = 0;
   }
 
   function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
+    if (camera.aspect < 0.95) setCompactFraming(true);
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
   window.addEventListener("resize", onResize);
+  onResize();
 
   function tick() {
     raf = requestAnimationFrame(tick);
     const dt = Math.min(clock.getDelta(), 0.05);
     const t = clock.elapsedTime;
 
-    groundMat.uniforms.uTime!.value = t;
-
-    // Inertial coast after a fling, then magnetic snap to nearest menhir
-    if (coasting && !dragging && !entering) {
-      targetYaw += yawVel * dt;
-      yaw += yawVel * dt;
-      yawVel *= Math.exp(-FRICTION * dt);
-      if (Math.abs(yawVel) < SNAP_VEL) {
-        coasting = false;
-        yawVel = 0;
-        snapToNearest();
-      }
-    } else if (!dragging && !entering) {
-      // Softer catch-up in look mode so profile→cursor never feels snappy
-      const damp = lookMode ? 0.045 : 0.14;
-      yaw += angleDelta(targetYaw, yaw) * damp;
+    if (!dragging && !entering && !reduced) {
+      const spin = presented === null ? 0.055 : 0.018;
+      orbitYaw += spin * dt;
     }
-    // while dragging, dragYaw already keeps yaw in lockstep with the finger
 
-    pitch += (targetPitch - pitch) * (dragging ? 0.25 : lookMode ? 0.06 : 0.1);
+    const targetYaw = orbitYaw + lookYaw;
+    const targetPitch = THREE.MathUtils.clamp(orbitPitch + lookPitch, -0.12, 0.55);
+    yaw += (targetYaw - yaw) * (dragging ? 0.28 : 0.07);
+    pitch += (targetPitch - pitch) * (dragging ? 0.22 : 0.08);
+
+    lookDesired.set(0, 0.42, 0);
+    if (presented !== null) {
+      pieces[presented]!.group.getWorldPosition(hotTarget);
+      lookDesired.lerp(hotTarget, 0.45);
+      lookDesired.y = 0.5;
+    }
+    lookTarget.lerp(lookDesired, 0.06);
 
     if (!entering) {
-      const breathe = reduced ? 0 : Math.sin(t * 0.35) * 0.15;
-      // Floor-grid center (0,0,0) is fixed CoG — camera rides a sphere around it
+      const breathe = reduced ? 0 : Math.sin(t * 0.28) * 0.08;
       const dist = Math.hypot(camR, camYBase);
       const baseElev = Math.atan2(camYBase, camR);
-      const elev = THREE.MathUtils.clamp(baseElev + pitch, 0.06, 1.45);
+      const elev = THREE.MathUtils.clamp(baseElev + pitch, 0.22, 1.15);
       const cosE = Math.cos(elev);
-      const camX = Math.cos(yaw) * cosE * dist;
-      const camZ = Math.sin(yaw) * cosE * dist;
-      const camY = Math.sin(elev) * dist + breathe;
-      camera.position.x += (camX - camera.position.x) * 0.08;
-      camera.position.y += (camY - camera.position.y) * 0.08;
-      camera.position.z += (camZ - camera.position.z) * 0.08;
-      camera.lookAt(0, 0, 0);
+      camPos.set(Math.cos(yaw) * cosE * dist, Math.sin(elev) * dist + breathe, Math.sin(yaw) * cosE * dist);
+      camera.position.lerp(camPos, 0.07);
+      camera.lookAt(lookTarget);
     } else {
       enterT += dt;
-      const k = Math.min(1, enterT / (reduced ? 0.35 : 0.95));
+      const k = Math.min(1, enterT / (reduced ? 0.32 : 0.9));
       const e = k * k * (3 - 2 * k);
       camera.position.lerpVectors(enterFrom, enterTo, e);
       camera.lookAt(enterLook);
@@ -342,14 +332,35 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
       }
     }
 
-    for (const s of stones) {
-      const hot = focus === s.index ? 1 : 0;
-      const cur = s.material.uniforms.uHot!.value as number;
-      s.material.uniforms.uHot!.value = cur + (hot - cur) * 0.1;
-      s.material.uniforms.uTime!.value = t;
-      const lift = hot * 0.12;
-      s.group.position.y += (lift - s.group.position.y) * 0.08;
-      s.group.scale.setScalar(1 + hot * 0.03);
+    for (const piece of pieces) {
+      const selected = presented === piece.index;
+      const hovered = focus === piece.index;
+      const heat = selected ? 1 : hovered ? 0.45 : 0;
+
+      toward.set(camera.position.x - piece.home.x, 0, camera.position.z - piece.home.z);
+      if (toward.lengthSq() > 0.0001) toward.normalize();
+      else toward.set(0, 0, 1);
+
+      hotTarget.copy(piece.home);
+      if (selected) {
+        hotTarget.addScaledVector(toward, 1.2);
+        hotTarget.y = 0.58;
+      }
+
+      piece.group.position.lerp(hotTarget, 0.09);
+      const scaleTo = selected ? 1.16 : hovered ? 1.04 : 1;
+      const cur = piece.group.scale.x;
+      piece.group.scale.setScalar(cur + (scaleTo - cur) * 0.1);
+
+      const rotTo = piece.homeRotY + (reduced || selected ? 0 : Math.sin(t * 0.22 + piece.index) * 0.05);
+      piece.group.rotation.y += (rotTo - piece.group.rotation.y) * 0.06;
+
+      for (const m of piece.materials) {
+        if (m.userData.baseEmissive === undefined) m.userData.baseEmissive = m.emissiveIntensity;
+        const base = m.userData.baseEmissive as number;
+        const goal = base + heat * 0.1;
+        m.emissiveIntensity += (goal - m.emissiveIntensity) * 0.12;
+      }
     }
 
     renderer.render(scene, camera);
@@ -358,21 +369,19 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   tick();
 
   return {
-    stones,
+    pieces,
     camera,
     renderer,
     scene,
     setFocus,
     getFocus,
+    present,
+    getPresented,
     pick,
     setLook,
     releaseLook,
     setDragging,
     orbit,
-    dragYaw,
-    flingYaw,
-    faceStone,
-    facingIndex,
     setCompactFraming,
     enter,
     abortEnter,

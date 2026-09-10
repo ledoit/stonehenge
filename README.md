@@ -6,9 +6,9 @@ Canonical hub while the custom domain is unpaid: **https://menhir-holdings.verce
 
 (`menhir-holdings.com` is not the bookmark. Do not redirect vercel.app hosts to it.)
 
-The apex site is a **clearing** — standing stones in fog. Approach one to enter a product. The circle is curated: only complete, live surfaces. Quell is the flagship.
+The apex site is a **studio table** — distinct product objects on a shallow architectural plate. The 3D world fills the viewport; click an object to bring it forward, then enter. The lattice is curated: only complete, live surfaces. Quell is first.
 
-**Lattice:** stones mirror [`src/data/projects.ts`](./src/data/projects.ts). Off-lattice: **Kaiser** (music console, hidden deploy).
+**Lattice:** objects mirror [`src/data/projects.ts`](./src/data/projects.ts). Off-lattice: **Kaiser** (music console, hidden deploy).
 
 **Stack:** Vite + TypeScript + Three.js (no React, no Next). Static WebGL, deployed on Vercel.
 
@@ -23,10 +23,10 @@ Phil tests the Vercel preview URL, not local `npm run dev`.
 
 ## Controls
 
-- Move pointer — free-look around the stone circle
-- Hover / face a stone — HUD updates
-- Click, Enter, or the Enter chip — walk into the product
-- `1`–`8` / arrows / dots — jump to a stone
+- Slow dolly / orbit around the table (pointer look, drag, wheel)
+- Hover an object — HUD index, name, tag
+- Click — object comes forward; click again, Enter, or the Enter chip to go in
+- `1`–`8` / arrows — present an object · Esc — put it back
 
 ## Canonical URLs
 
@@ -42,7 +42,7 @@ Phil tests the Vercel preview URL, not local `npm run dev`.
 | Matrix Maze | https://matmaz.vercel.app |
 | Inferno | https://inferno-ruby.vercel.app |
 
-Off-circle (not presentable as a public stone): Kaiser (`kaiser-mu.vercel.app`).
+Off-table (not presentable as a public object): Kaiser (`kaiser-mu.vercel.app`).
 
 See [docs/DNS.md](./docs/DNS.md) and [docs/VERCEL.md](./docs/VERCEL.md).
 

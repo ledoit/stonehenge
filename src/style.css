@@ -66,11 +66,11 @@ body {
   pointer-events: none;
   z-index: 20;
   background: radial-gradient(
-    ellipse 77% 64% at 50% 42%,
+    ellipse 80% 62% at 50% 46%,
     transparent 0%,
-    transparent 55%,
-    rgba(18, 20, 15, 0.19) 78%,
-    rgba(18, 20, 15, 0.59) 100%
+    transparent 52%,
+    rgba(18, 20, 15, 0.22) 78%,
+    rgba(18, 20, 15, 0.62) 100%
   );
   opacity: 1;
   transition: background 0.8s ease;
@@ -83,30 +83,33 @@ body {
 
 .mast {
   position: fixed;
-  top: clamp(1.1rem, 3.5vh, 2rem);
+  top: clamp(0.4rem, 1.8vh, 1.1rem);
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
   pointer-events: none;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  width: min(96vw, 72rem);
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 .mast__brand {
-  font-family: Newsreader, "Times New Roman", serif;
-  font-style: italic;
-  font-weight: 500;
-  font-size: 1.15rem;
-  letter-spacing: 0.02em;
+  font-family: Outfit, ui-sans-serif, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: clamp(2.6rem, 9vw, 6.2rem);
+  letter-spacing: -0.06em;
+  line-height: 0.82;
   color: var(--bone);
 }
 
 .hud {
   position: fixed;
   left: 50%;
-  bottom: clamp(4.5rem, 12vh, 6.5rem);
+  bottom: clamp(2.1rem, 7vh, 3.6rem);
   transform: translateX(-50%) translateY(0.6rem);
   z-index: 10;
-  width: min(28rem, calc(100vw - 2rem));
+  width: min(32rem, calc(100vw - 2rem));
   text-align: center;
   pointer-events: none;
   opacity: 0;
@@ -134,9 +137,9 @@ body {
 .hud__name {
   font-family: Outfit, ui-sans-serif, sans-serif;
   font-weight: 600;
-  font-size: clamp(2.1rem, 6vw, 3.4rem);
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  font-size: clamp(2.4rem, 7vw, 4.2rem);
+  letter-spacing: -0.04em;
+  line-height: 1.02;
   color: var(--bone);
 }
 
@@ -169,40 +172,10 @@ body {
   outline: none;
 }
 
-.stones {
-  position: fixed;
-  left: 50%;
-  bottom: clamp(1.6rem, 4.5vh, 2.4rem);
-  transform: translateX(-50%);
-  z-index: 12;
-  display: flex;
-  gap: 0.55rem;
-  pointer-events: auto;
-}
-
-.stones button {
-  width: 8px;
-  height: 8px;
-  border: 0;
-  border-radius: 50%;
-  padding: 0;
-  background: color-mix(in oklab, var(--bone) 28%, transparent);
-  cursor: pointer;
-}
-
-.stones button.is-on {
-  background: var(--bone);
-}
-
-.stones button:focus-visible {
-  outline: 1px solid var(--lichen);
-  outline-offset: 3px;
-}
-
 .rail {
   position: fixed;
   right: clamp(1rem, 3vw, 2rem);
-  bottom: clamp(1rem, 3vh, 1.75rem);
+  bottom: clamp(0.7rem, 2.2vh, 1.4rem);
   z-index: 10;
   font-size: 0.65rem;
   letter-spacing: 0.14em;
@@ -234,26 +207,26 @@ body {
   }
 
   .mast {
-    top: max(1rem, env(safe-area-inset-top));
+    top: max(0.35rem, env(safe-area-inset-top));
+  }
+
+  .mast__brand {
+    font-size: clamp(2.4rem, 16vw, 4.4rem);
   }
 
   .hud {
-    bottom: max(4.25rem, calc(env(safe-area-inset-bottom) + 3.5rem));
+    bottom: max(2.4rem, calc(env(safe-area-inset-bottom) + 2.2rem));
   }
 
   .hud__name {
-    font-size: clamp(1.85rem, 9vw, 2.6rem);
-  }
-
-  .stones {
-    bottom: max(2.6rem, calc(env(safe-area-inset-bottom) + 2.1rem));
+    font-size: clamp(2rem, 10vw, 3rem);
   }
 
   .rail {
     left: 50%;
     right: auto;
     transform: translateX(-50%);
-    bottom: max(0.7rem, env(safe-area-inset-bottom));
+    bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
 }
 

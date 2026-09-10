@@ -11,8 +11,8 @@ export type Project = {
 export const hubUrl = "https://menhir-holdings.vercel.app";
 
 /**
- * Presentable lattice — live vercel.app. Diaries off-circle (Phil).
- * Off-circle: Kaiser (hidden), Erudite/Suplex (blank WASM), JobJeeves (API shell),
+ * Presentable lattice — live vercel.app. Diaries off-table (Phil).
+ * Off-table: Kaiser (hidden), Erudite/Suplex (blank WASM), JobJeeves (API shell),
  * Vega (parked), Vantage/Silo/Gamolingo/menhir-web (not production), shelved work.
  */
 export const projects: Project[] = [
