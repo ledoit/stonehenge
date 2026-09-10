@@ -43,7 +43,7 @@ export const projects: Project[] = [
   {
     id: "strob",
     name: "Strob",
-    tagline: "Live-synced mood lights. One controller, many viewers.",
+    tagline: "Party lighting plot. One desk, many walls.",
     href: "https://strob-menhir-holdings.vercel.app",
     glow: "#ff3d8a",
     height: 3.25,
