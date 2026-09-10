@@ -26,7 +26,7 @@ Phil tests the Vercel preview URL, not local `npm run dev`.
 - Move pointer — free-look around the stone circle
 - Hover / face a stone — HUD updates
 - Click, Enter, or the Enter chip — walk into the product
-- `1`–`6` / arrows / dots — jump to a stone
+- `1`–`8` / arrows / dots — jump to a stone
 
 ## Canonical URLs
 
@@ -36,7 +36,9 @@ Phil tests the Vercel preview URL, not local `npm run dev`.
 | Quell | https://quellcube.vercel.app |
 | Freeze | https://freeze-lilac.vercel.app |
 | Gamma | https://gamma-three-lime.vercel.app |
-| Diaries | https://diaries-gray.vercel.app |
+| Strob | https://strob-menhir-holdings.vercel.app |
+| Vecchio | https://vecchio-menhir-holdings.vercel.app |
+| Paid | https://paid-menhir-holdings.vercel.app |
 | Matrix Maze | https://matmaz.vercel.app |
 | Inferno | https://inferno-ruby.vercel.app |
 

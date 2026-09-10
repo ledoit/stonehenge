@@ -27,12 +27,14 @@ Then: apex = hub, `www` → apex, product subdomains → each Vercel project. Un
 | Quell | https://quellcube.vercel.app |
 | Freeze | https://freeze-lilac.vercel.app |
 | Gamma | https://gamma-three-lime.vercel.app |
-| Diaries | https://diaries-gray.vercel.app |
+| Strob | https://strob-menhir-holdings.vercel.app |
+| Vecchio | https://vecchio-menhir-holdings.vercel.app |
+| Paid | https://paid-menhir-holdings.vercel.app |
 | Matrix Maze | https://matmaz.vercel.app |
 | Inferno | https://inferno-ruby.vercel.app |
 | Kaiser (hidden) | https://kaiser-mu.vercel.app |
 
-Avoid aliases that **308 to `{product}.menhir-holdings.com`** (Strob, Vecchio, Paid, some Gamma hosts).
+Do not 308 product `*.vercel.app` hosts to unpaid `{product}.menhir-holdings.com`.
 
 ## Redirects
 

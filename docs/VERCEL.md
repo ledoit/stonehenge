@@ -30,8 +30,10 @@ npx vercel@54 <command> --scope menhir-holdings
 | [stonehenge](https://github.com/menhir-holdings/stonehenge) | `stonehenge` | https://menhir-holdings.vercel.app | stonehenge-menhir-holdings.vercel.app |
 | [quell](https://github.com/menhir-holdings/quell) | `quellcube` | https://quellcube.vercel.app | quellcube-menhir-holdings.vercel.app |
 | [freeze](https://github.com/menhir-holdings/freeze) | `freeze` | https://freeze-lilac.vercel.app | freeze-menhir-holdings.vercel.app |
-| [Gamma](https://github.com/menhir-holdings/Gamma) | `gamma` | https://gamma-three-lime.vercel.app | gamma-menhir-holdings.vercel.app · gammacolor.vercel.app *(may 308 to unpaid domain)* |
-| [diaries](https://github.com/menhir-holdings/diaries) | `diaries` | https://diaries-gray.vercel.app | diaries-menhir-holdings.vercel.app |
+| [Gamma](https://github.com/menhir-holdings/Gamma) | `gamma` | https://gamma-three-lime.vercel.app | gamma-menhir-holdings.vercel.app · gammacolor.vercel.app |
+| [Strob](https://github.com/menhir-holdings/Strob) | `strob` | https://strob-menhir-holdings.vercel.app | strob.vercel.app *(must not 308 to unpaid domain)* |
+| [Vecchio](https://github.com/menhir-holdings/Vecchio) | `vecchio` | https://vecchio-menhir-holdings.vercel.app | vecchi.vercel.app |
+| [paid](https://github.com/menhir-holdings/paid) | `paid` | https://paid-menhir-holdings.vercel.app | paid-eight.vercel.app |
 | [Matrix-Maze](https://github.com/menhir-holdings/Matrix-Maze) | `matrix-maze` | https://matmaz.vercel.app | matrix-maze-kappa.vercel.app → matmaz |
 | [inferno](https://github.com/menhir-holdings/inferno) | `inferno` | https://inferno-ruby.vercel.app | inferno-menhir-holdings.vercel.app |
 
@@ -72,9 +74,8 @@ Hobby cannot auto-deploy from **private** `menhir-holdings` repos. CI may show V
 | BOB | Deleted — Vega is the website/gallery product |
 | enjoyments_vectorized | Deleted with RnD |
 | Gnomon / Echo / Horizon / Scour | Wiped or canceled |
-| Strob, Vecchio | Shipped toys; PartyKit + custom-domain 308 — off-circle |
 | JobJeeves | Frontend shell without a durable API — off-circle |
-| Paid | Personal planner — off-circle |
+| Diaries | Complete OSRS tool; off-circle by taste |
 | Vega | Parked (Clerk / Blob) — off-circle |
 | Erudite, Suplex | Live aliases exist; WASM surface blank in QC — off-circle |
 | Vantage, Silo, Gamolingo, menhir-web | Not production / supplier baptism |

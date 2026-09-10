@@ -11,10 +11,9 @@ export type Project = {
 export const hubUrl = "https://menhir-holdings.vercel.app";
 
 /**
- * Presentable lattice only — live vercel.app, complete enough to stand next to Quell.
- * Off-circle: Kaiser (hidden), Erudite/Suplex (blank WASM), Strob/Vecchio (PartyKit +
- * custom-domain redirects), JobJeeves (API shell), Paid (personal), Vega (parked),
- * Vantage/Silo/Gamolingo/menhir-web (not production), shelved work.
+ * Presentable lattice — live vercel.app. Diaries off-circle (Phil).
+ * Off-circle: Kaiser (hidden), Erudite/Suplex (blank WASM), JobJeeves (API shell),
+ * Vega (parked), Vantage/Silo/Gamolingo/menhir-web (not production), shelved work.
  */
 export const projects: Project[] = [
   {
@@ -42,12 +41,28 @@ export const projects: Project[] = [
     height: 3.05,
   },
   {
-    id: "diaries",
-    name: "Diaries",
-    tagline: "Elite diaries, UIM Secretary, stats checker.",
-    href: "https://diaries-gray.vercel.app",
-    glow: "#d4b44a",
-    height: 3.15,
+    id: "strob",
+    name: "Strob",
+    tagline: "Live-synced mood lights. One controller, many viewers.",
+    href: "https://strob-menhir-holdings.vercel.app",
+    glow: "#ff3d8a",
+    height: 3.25,
+  },
+  {
+    id: "vecchio",
+    name: "Vecchio",
+    tagline: "Shared text across devices. One code, many screens.",
+    href: "https://vecchio-menhir-holdings.vercel.app",
+    glow: "#c4a574",
+    height: 3.1,
+  },
+  {
+    id: "paid",
+    name: "Paid",
+    tagline: "Morning work planner. Thirty-minute blocks.",
+    href: "https://paid-menhir-holdings.vercel.app",
+    glow: "#e8d5a3",
+    height: 3.0,
   },
   {
     id: "matrix-maze",
