@@ -18,9 +18,10 @@ const LAYOUT: Record<string, { x: number; z: number; rot: number }> = {
   gamma: { x: 0.04, z: -1.22, rot: -0.2 },
   strob: { x: 1.78, z: -1.0, rot: 0.08 },
   vecchio: { x: 1.88, z: 0.18, rot: -0.28 },
-  paid: { x: 1.05, z: 1.05, rot: 0.18 },
-  "matrix-maze": { x: -0.88, z: 1.08, rot: -0.1 },
+  paid: { x: 1.22, z: 1.0, rot: 0.18 },
+  "matrix-maze": { x: -1.05, z: 1.05, rot: -0.1 },
   inferno: { x: 0.16, z: 0.42, rot: 0.35 },
+  jobjeeves: { x: 0.42, z: 1.18, rot: -0.22 },
 };
 
 function mat(
@@ -356,6 +357,35 @@ function infernoCoals(glow: string, index: number, materials: THREE.MeshPhysical
   return g;
 }
 
+function jobjeevesDesk(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+  const g = new THREE.Group();
+  const blotter = mat("#2c3832", glow, { roughness: 0.62, metalness: 0.08, emissiveIntensity: 0.04 });
+  const file = mat("#d8ddd6", glow, { roughness: 0.48, metalness: 0.04, emissiveIntensity: 0.02 });
+  const tab = mat("#3d5c4a", glow, { roughness: 0.4, metalness: 0.06, emissiveIntensity: 0.12 });
+  materials.push(blotter, file, tab);
+
+  const base = tag(new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.06, 0.62), blotter), index);
+  base.position.y = 0.03;
+  g.add(base);
+
+  const sheets: Array<[number, number, number]> = [
+    [-0.06, 0.09, 0.08],
+    [0.04, 0.12, -0.04],
+    [-0.02, 0.16, 0.02],
+  ];
+  for (const [x, y, z] of sheets) {
+    const s = tag(new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.02, 0.44), file), index);
+    s.position.set(x, y, z);
+    s.rotation.y = x * 0.4;
+    g.add(s);
+  }
+
+  const clip = tag(new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.04, 0.08), tab), index);
+  clip.position.set(-0.12, 0.2, -0.16);
+  g.add(clip);
+  return g;
+}
+
 function fallbackBlock(project: Project, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
   const g = new THREE.Group();
   const m = mat("#4a463c", project.glow, { roughness: 0.5 });
@@ -378,6 +408,7 @@ export function createPiece(project: Project, index: number): StudioPiece {
     paid: () => paidPlanner(project.glow, index, materials),
     "matrix-maze": () => mazeTile(project.glow, index, materials),
     inferno: () => infernoCoals(project.glow, index, materials),
+    jobjeeves: () => jobjeevesDesk(project.glow, index, materials),
   };
 
   const inner = (builders[project.id] ?? (() => fallbackBlock(project, index, materials)))();

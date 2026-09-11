@@ -26,7 +26,7 @@ Phil tests the Vercel preview URL, not local `npm run dev`.
 - Slow dolly / orbit around the table (pointer look, drag, wheel)
 - Hover an object — HUD index, name, tag
 - Click — object comes forward; click again, Enter, or the Enter chip to go in
-- `1`–`8` / arrows — present an object · Esc — put it back
+- `1`–`9` / arrows — present an object · Esc — put it back
 
 ## Canonical URLs
 
@@ -41,6 +41,7 @@ Phil tests the Vercel preview URL, not local `npm run dev`.
 | Paid | https://paid-menhir-holdings.vercel.app |
 | Matrix Maze | https://matmaz.vercel.app |
 | Inferno | https://inferno-ruby.vercel.app |
+| JobJeeves | https://jobjeeves-menhir-holdings.vercel.app |
 
 Off-table (not presentable as a public object): Kaiser (`kaiser-mu.vercel.app`).
 

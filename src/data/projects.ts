@@ -12,8 +12,8 @@ export const hubUrl = "https://menhir-holdings.vercel.app";
 
 /**
  * Presentable lattice — live vercel.app. Diaries off-table (Phil).
- * Off-table: Kaiser (hidden), Erudite/Suplex (blank WASM), JobJeeves (API shell),
- * Vega (parked), Vantage/Silo/Gamolingo/menhir-web (not production), shelved work.
+ * Off-table: Kaiser (hidden), Erudite/Suplex (blank WASM), Vega (skeleton in review),
+ * Vantage/Silo/Gamolingo/menhir-web (not production), shelved work.
  */
 export const projects: Project[] = [
   {
@@ -79,5 +79,13 @@ export const projects: Project[] = [
     href: "https://inferno-ruby.vercel.app",
     glow: "#ff5a1f",
     height: 3.45,
+  },
+  {
+    id: "jobjeeves",
+    name: "JobJeeves",
+    tagline: "Hiring desk. File, screen, packet.",
+    href: "https://jobjeeves-menhir-holdings.vercel.app",
+    glow: "#3d5c4a",
+    height: 3.15,
   },
 ];
