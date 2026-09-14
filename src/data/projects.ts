@@ -59,7 +59,7 @@ export const projects: Project[] = [
   {
     id: "paid",
     name: "Paid",
-    tagline: "Morning work planner. Thirty-minute blocks.",
+    tagline: "Today’s billed work. Who × hours × rate.",
     href: "https://paid-menhir-holdings.vercel.app",
     glow: "#e8d5a3",
     height: 3.0,

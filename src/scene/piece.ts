@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import type { Project } from "../data/projects";
 
 export type StudioPiece = {
@@ -59,81 +60,91 @@ function collect(root: THREE.Object3D, index: number, pickables: THREE.Object3D[
   return first;
 }
 
+/** GAN / MoYu stickerless ABS — bright plastic, never a black core. */
+const STICKERLESS = {
+  white: "#F6F4EE",
+  yellow: "#FFD400",
+  red: "#E8332A",
+  orange: "#FF7A12",
+  green: "#1FBF4A",
+  blue: "#1A74E6",
+} as const;
+
+function shade(hex: string, amount: number): string {
+  const c = new THREE.Color(hex);
+  c.multiplyScalar(amount);
+  return `#${c.getHexString()}`;
+}
+
+function stickerlessPlastic(hex: string, glow: string): THREE.MeshPhysicalMaterial {
+  return mat(hex, glow, {
+    roughness: 0.22,
+    metalness: 0.04,
+    clearcoat: 0.62,
+    clearcoatRoughness: 0.2,
+    emissiveIntensity: 0.035,
+  });
+}
+
 function quellCube(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
   const g = new THREE.Group();
-  const body = mat("#2a2825", glow, { roughness: 0.38, metalness: 0.04, emissiveIntensity: 0.03 });
-  materials.push(body);
-  const core = tag(new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), body), index);
-  core.position.y = 0.35;
-  g.add(core);
+  const cubie = 0.214;
+  const gap = 0.01;
+  const pitch = cubie + gap;
+  const geo = new RoundedBoxGeometry(cubie, cubie, cubie, 2, 0.034);
+  const verts = geo.attributes.position.count;
+  const perFace = Math.floor(verts / 6);
+  geo.clearGroups();
+  for (let i = 0; i < 6; i++) geo.addGroup(i * perFace, perFace, i);
 
-  const faces: { color: string; build: (m: THREE.MeshPhysicalMaterial) => void }[] = [
-    {
-      color: "#c8ced4",
-      build(m) {
-        for (const i of [-1, 0, 1]) {
-          for (const j of [-1, 0, 1]) {
-            const s = tag(new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.02, 0.17), m), index);
-            s.position.set(i * 0.21, 0.71, j * 0.21);
-            g.add(s);
-          }
-        }
-      },
-    },
-    {
-      color: "#9a3530",
-      build(m) {
-        for (const i of [-1, 0, 1]) {
-          for (const j of [-1, 0, 1]) {
-            const s = tag(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.17, 0.17), m), index);
-            s.position.set(0.36, 0.35 + i * 0.21, j * 0.21);
-            g.add(s);
-          }
-        }
-      },
-    },
-    {
-      color: "#b45a24",
-      build(m) {
-        for (const i of [-1, 0, 1]) {
-          for (const j of [-1, 0, 1]) {
-            const s = tag(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.17, 0.17), m), index);
-            s.position.set(-0.36, 0.35 + i * 0.21, j * 0.21);
-            g.add(s);
-          }
-        }
-      },
-    },
-    {
-      color: "#3a6a46",
-      build(m) {
-        for (const i of [-1, 0, 1]) {
-          for (const j of [-1, 0, 1]) {
-            const s = tag(new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.17, 0.02), m), index);
-            s.position.set(j * 0.21, 0.35 + i * 0.21, 0.36);
-            g.add(s);
-          }
-        }
-      },
-    },
-    {
-      color: "#2c4c82",
-      build(m) {
-        for (const i of [-1, 0, 1]) {
-          for (const j of [-1, 0, 1]) {
-            const s = tag(new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.17, 0.02), m), index);
-            s.position.set(j * 0.21, 0.35 + i * 0.21, -0.36);
-            g.add(s);
-          }
-        }
-      },
-    },
+  const cache = new Map<string, THREE.MeshPhysicalMaterial>();
+  const plastic = (hex: string) => {
+    const hit = cache.get(hex);
+    if (hit) return hit;
+    const m = stickerlessPlastic(hex, glow);
+    materials.push(m);
+    cache.set(hex, m);
+    return m;
+  };
+
+  // Box groups: +x −x +y −y +z −z
+  const faceHex = [
+    STICKERLESS.red,
+    STICKERLESS.orange,
+    STICKERLESS.white,
+    STICKERLESS.yellow,
+    STICKERLESS.green,
+    STICKERLESS.blue,
+  ];
+  const outside: Array<[number, 1 | -1]> = [
+    [0, 1],
+    [0, -1],
+    [1, 1],
+    [1, -1],
+    [2, 1],
+    [2, -1],
   ];
 
-  for (const face of faces) {
-    const m = mat(face.color, glow, { roughness: 0.32, emissiveIntensity: 0.04 });
-    materials.push(m);
-    face.build(m);
+  for (const ix of [-1, 0, 1] as const) {
+    for (const iy of [-1, 0, 1] as const) {
+      for (const iz of [-1, 0, 1] as const) {
+        if (ix === 0 && iy === 0 && iz === 0) continue;
+        const coord = [ix, iy, iz];
+        const exposed: string[] = [];
+        const slots = faceHex.map((hex, fi) => {
+          const [axis, sign] = outside[fi];
+          if (coord[axis] === sign) {
+            exposed.push(hex);
+            return plastic(hex);
+          }
+          return null;
+        });
+        const inner = plastic(shade(exposed[0] ?? STICKERLESS.white, 0.88));
+        const mesh = tag(new THREE.Mesh(geo, slots.map((m) => m ?? inner)), index);
+        mesh.position.set(ix * pitch, 0.35 + iy * pitch, iz * pitch);
+        g.add(mesh);
+      }
+    }
   }
 
   return g;
