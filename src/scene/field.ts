@@ -46,6 +46,49 @@ function roundedPlate(w: number, d: number, r: number, depth: number): THREE.Ext
   });
 }
 
+/** World-space set dressing. Not a product, not on the orbiting piece rig. */
+function createMenhirBackdrop(): THREE.Group {
+  const backdrop = new THREE.Group();
+  backdrop.name = "menhirBackdrop";
+
+  const shape = new THREE.Shape();
+  shape.moveTo(-3.05, 0);
+  shape.lineTo(-2.65, 1.05);
+  shape.lineTo(-1.85, 2.25);
+  shape.lineTo(-0.5, 2.95);
+  shape.lineTo(0.25, 3.08);
+  shape.lineTo(1.35, 2.75);
+  shape.lineTo(2.35, 1.85);
+  shape.lineTo(3.0, 0.78);
+  shape.lineTo(3.15, 0);
+  shape.closePath();
+
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth: 1.2,
+    bevelEnabled: true,
+    bevelThickness: 0.09,
+    bevelSize: 0.11,
+    bevelSegments: 2,
+  });
+  geo.translate(0, 0, -0.6);
+
+  const granite = new THREE.MeshStandardMaterial({
+    color: 0x8c9088,
+    roughness: 0.92,
+    metalness: 0.04,
+    envMapIntensity: 0.22,
+  });
+
+  const stone = new THREE.Mesh(geo, granite);
+  stone.position.set(0.2, -1.2, -4.05);
+  stone.rotation.y = 0.05;
+  stone.castShadow = true;
+  stone.receiveShadow = true;
+  backdrop.add(stone);
+
+  return backdrop;
+}
+
 export function createField(canvas: HTMLCanvasElement): FieldApi {
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -53,25 +96,20 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     alpha: false,
     powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const firstDpr = Math.min(window.devicePixelRatio, 1.5);
+  renderer.setPixelRatio(firstDpr);
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x12140f, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.12;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
 
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(0x12140f, 0.024);
   scene.background = new THREE.Color(0x12140f);
-
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const env = new RoomEnvironment();
-  scene.environment = pmrem.fromScene(env, 0.05).texture;
   scene.environmentIntensity = 0.62;
-  env.dispose();
-  pmrem.dispose();
 
   const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 80);
   camera.position.set(0, 6.4, 10.6);
@@ -84,11 +122,11 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   key.castShadow = true;
   key.shadow.mapSize.set(2048, 2048);
   key.shadow.camera.near = 1;
-  key.shadow.camera.far = 28;
-  key.shadow.camera.left = -7;
-  key.shadow.camera.right = 7;
-  key.shadow.camera.top = 7;
-  key.shadow.camera.bottom = -7;
+  key.shadow.camera.far = 32;
+  key.shadow.camera.left = -9;
+  key.shadow.camera.right = 9;
+  key.shadow.camera.top = 9;
+  key.shadow.camera.bottom = -9;
   key.shadow.bias = -0.00035;
   scene.add(key);
 
@@ -148,6 +186,9 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   riser.castShadow = true;
   scene.add(riser);
 
+  const backdrop = createMenhirBackdrop();
+  scene.add(backdrop);
+
   const pieces = projects.map((p, i) => createPiece(p, i));
   for (const p of pieces) scene.add(p.group);
 
@@ -174,6 +215,8 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
   let enterLook = new THREE.Vector3();
   let raf = 0;
   const clock = new THREE.Clock();
+  let frames = 0;
+  let envArmed = false;
   const reduced =
     typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const lookTarget = new THREE.Vector3(0, 0.42, 0);
@@ -364,6 +407,20 @@ export function createField(canvas: HTMLCanvasElement): FieldApi {
     }
 
     renderer.render(scene, camera);
+
+    frames += 1;
+    if (!envArmed && frames >= 2) {
+      envArmed = true;
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      const env = new RoomEnvironment();
+      scene.environment = pmrem.fromScene(env, 0.05).texture;
+      env.dispose();
+      pmrem.dispose();
+    }
+    if (frames === 48) {
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
   }
 
   tick();
