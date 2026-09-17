@@ -6,7 +6,7 @@ export type StudioPiece = {
   group: THREE.Group;
   mesh: THREE.Mesh;
   pickables: THREE.Object3D[];
-  materials: THREE.MeshPhysicalMaterial[];
+  materials: THREE.MeshStandardMaterial[];
   index: number;
   home: THREE.Vector3;
   homeRotY: number;
@@ -59,87 +59,78 @@ function collect(root: THREE.Object3D, index: number, pickables: THREE.Object3D[
   return first;
 }
 
-function quellCube(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+/** GAN / MoYu stickerless ABS — bright plastic faces, cream inners. Never a black core. */
+const STICKERLESS = {
+  white: "#F6F4EE",
+  yellow: "#FFD400",
+  red: "#E8332A",
+  orange: "#FF7A12",
+  green: "#1FBF4A",
+  blue: "#1A74E6",
+  inner: "#F3EFE6",
+} as const;
+
+function absPlastic(hex: string, glow: string): THREE.MeshStandardMaterial {
+  return new THREE.MeshStandardMaterial({
+    color: hex,
+    roughness: 0.36,
+    metalness: 0.02,
+    envMapIntensity: 0.42,
+    emissive: new THREE.Color(glow),
+    emissiveIntensity: 0.02,
+  });
+}
+
+function quellCube(glow: string, index: number, materials: THREE.MeshStandardMaterial[]): THREE.Group {
   const g = new THREE.Group();
-  const body = mat("#2a2825", glow, { roughness: 0.38, metalness: 0.04, emissiveIntensity: 0.03 });
-  materials.push(body);
-  const core = tag(new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), body), index);
-  core.position.y = 0.35;
-  g.add(core);
+  const cubie = 0.22;
+  const gap = 0.016;
+  const pitch = cubie + gap;
+  const lift = cubie * 0.5 + pitch;
+  const geo = new THREE.BoxGeometry(cubie, cubie, cubie);
 
-  const faces: { color: string; build: (m: THREE.MeshPhysicalMaterial) => void }[] = [
-    {
-      color: "#c8ced4",
-      build(m) {
-        for (const i of [-1, 0, 1]) {
-          for (const j of [-1, 0, 1]) {
-            const s = tag(new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.02, 0.17), m), index);
-            s.position.set(i * 0.21, 0.71, j * 0.21);
-            g.add(s);
-          }
-        }
-      },
-    },
-    {
-      color: "#9a3530",
-      build(m) {
-        for (const i of [-1, 0, 1]) {
-          for (const j of [-1, 0, 1]) {
-            const s = tag(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.17, 0.17), m), index);
-            s.position.set(0.36, 0.35 + i * 0.21, j * 0.21);
-            g.add(s);
-          }
-        }
-      },
-    },
-    {
-      color: "#b45a24",
-      build(m) {
-        for (const i of [-1, 0, 1]) {
-          for (const j of [-1, 0, 1]) {
-            const s = tag(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.17, 0.17), m), index);
-            s.position.set(-0.36, 0.35 + i * 0.21, j * 0.21);
-            g.add(s);
-          }
-        }
-      },
-    },
-    {
-      color: "#3a6a46",
-      build(m) {
-        for (const i of [-1, 0, 1]) {
-          for (const j of [-1, 0, 1]) {
-            const s = tag(new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.17, 0.02), m), index);
-            s.position.set(j * 0.21, 0.35 + i * 0.21, 0.36);
-            g.add(s);
-          }
-        }
-      },
-    },
-    {
-      color: "#2c4c82",
-      build(m) {
-        for (const i of [-1, 0, 1]) {
-          for (const j of [-1, 0, 1]) {
-            const s = tag(new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.17, 0.02), m), index);
-            s.position.set(j * 0.21, 0.35 + i * 0.21, -0.36);
-            g.add(s);
-          }
-        }
-      },
-    },
-  ];
-
-  for (const face of faces) {
-    const m = mat(face.color, glow, { roughness: 0.32, emissiveIntensity: 0.04 });
+  const plastic = (hex: string) => {
+    const m = absPlastic(hex, glow);
     materials.push(m);
-    face.build(m);
+    return m;
+  };
+
+  // BoxGeometry groups: +x −x +y −y +z −z — exterior faces only; inners are cream ABS.
+  const faceHex = [
+    STICKERLESS.red,
+    STICKERLESS.orange,
+    STICKERLESS.white,
+    STICKERLESS.yellow,
+    STICKERLESS.green,
+    STICKERLESS.blue,
+  ];
+  const outside: Array<[number, 1 | -1]> = [
+    [0, 1],
+    [0, -1],
+    [1, 1],
+    [1, -1],
+    [2, 1],
+    [2, -1],
+  ];
+  const colors = faceHex.map((hex) => plastic(hex));
+  const cream = plastic(STICKERLESS.inner);
+
+  for (const ix of [-1, 0, 1] as const) {
+    for (const iy of [-1, 0, 1] as const) {
+      for (const iz of [-1, 0, 1] as const) {
+        const coord = [ix, iy, iz];
+        const faces = outside.map(([axis, sign], fi) => (coord[axis] === sign ? colors[fi]! : cream));
+        const mesh = tag(new THREE.Mesh(geo, faces), index);
+        mesh.position.set(ix * pitch, lift + iy * pitch, iz * pitch);
+        g.add(mesh);
+      }
+    }
   }
 
   return g;
 }
 
-function freezeIce(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+function freezeIce(glow: string, index: number, materials: THREE.MeshStandardMaterial[]): THREE.Group {
   const g = new THREE.Group();
   const ice = mat("#8ec9dc", glow, {
     roughness: 0.08,
@@ -177,7 +168,7 @@ function freezeIce(glow: string, index: number, materials: THREE.MeshPhysicalMat
   return g;
 }
 
-function gammaPrism(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+function gammaPrism(glow: string, index: number, materials: THREE.MeshStandardMaterial[]): THREE.Group {
   const g = new THREE.Group();
   const glass = mat("#c4544a", glow, {
     roughness: 0.12,
@@ -222,7 +213,7 @@ function gammaPrism(glow: string, index: number, materials: THREE.MeshPhysicalMa
   return g;
 }
 
-function strobLamp(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+function strobLamp(glow: string, index: number, materials: THREE.MeshStandardMaterial[]): THREE.Group {
   const g = new THREE.Group();
   const metal = mat("#3a3836", glow, { roughness: 0.28, metalness: 0.72, emissiveIntensity: 0.03 });
   const bulb = mat("#ff4a96", glow, { roughness: 0.18, metalness: 0.05, emissiveIntensity: 0.55 });
@@ -246,7 +237,7 @@ function strobLamp(glow: string, index: number, materials: THREE.MeshPhysicalMat
   return g;
 }
 
-function vecchioPapers(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+function vecchioPapers(glow: string, index: number, materials: THREE.MeshStandardMaterial[]): THREE.Group {
   const g = new THREE.Group();
   const sheet = mat("#cbb79a", glow, { roughness: 0.72, metalness: 0.0, emissiveIntensity: 0.04 });
   const fold = mat("#b79d7a", glow, { roughness: 0.68, metalness: 0.0, emissiveIntensity: 0.05 });
@@ -268,7 +259,7 @@ function vecchioPapers(glow: string, index: number, materials: THREE.MeshPhysica
   return g;
 }
 
-function paidPlanner(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+function paidPlanner(glow: string, index: number, materials: THREE.MeshStandardMaterial[]): THREE.Group {
   const g = new THREE.Group();
   const cover = mat("#3a342c", glow, { roughness: 0.55, metalness: 0.08, emissiveIntensity: 0.04 });
   const gold = mat("#d2b56a", glow, { roughness: 0.32, metalness: 0.45, emissiveIntensity: 0.1 });
@@ -304,7 +295,7 @@ function paidPlanner(glow: string, index: number, materials: THREE.MeshPhysicalM
   return g;
 }
 
-function mazeTile(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+function mazeTile(glow: string, index: number, materials: THREE.MeshStandardMaterial[]): THREE.Group {
   const g = new THREE.Group();
   const floor = mat("#243028", glow, { roughness: 0.7, metalness: 0.05, emissiveIntensity: 0.04 });
   const wall = mat("#2f4a36", glow, { roughness: 0.55, metalness: 0.08, emissiveIntensity: 0.08 });
@@ -331,33 +322,66 @@ function mazeTile(glow: string, index: number, materials: THREE.MeshPhysicalMate
   return g;
 }
 
-function infernoCoals(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+function infernoCoals(glow: string, index: number, materials: THREE.MeshStandardMaterial[]): THREE.Group {
   const g = new THREE.Group();
-  const coal = mat("#4a2418", glow, { roughness: 0.42, metalness: 0.12, emissiveIntensity: 0.28 });
-  const ember = mat("#ff5a1f", glow, { roughness: 0.22, metalness: 0.08, emissiveIntensity: 0.62 });
-  materials.push(coal, ember);
+  const iron = mat("#2a1c16", glow, { roughness: 0.72, metalness: 0.28, emissiveIntensity: 0.04 });
+  const coal = mat("#3a2218", glow, { roughness: 0.8, metalness: 0.06, emissiveIntensity: 0.1 });
+  const ember = mat("#ff5a1f", glow, { roughness: 0.42, metalness: 0.04, emissiveIntensity: 0.72 });
+  const flame = mat("#ff7a18", glow, { roughness: 0.38, metalness: 0.0, emissiveIntensity: 0.88 });
+  const range = mat("#e8b86d", glow, { roughness: 0.32, metalness: 0.18, emissiveIntensity: 0.42 });
+  materials.push(iron, coal, ember, flame, range);
 
-  const main = tag(new THREE.Mesh(new THREE.IcosahedronGeometry(0.32, 0), coal), index);
-  main.position.y = 0.3;
-  main.rotation.set(0.4, 0.2, 0.15);
-  g.add(main);
+  const dish = tag(new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.48, 0.07, 24), iron), index);
+  dish.position.y = 0.035;
+  g.add(dish);
 
-  const chunks: Array<[number, number, number, number]> = [
-    [0.28, 0.16, 0.12, 0.16],
-    [-0.24, 0.14, -0.16, 0.14],
-    [0.06, 0.42, -0.18, 0.12],
-    [-0.08, 0.18, 0.26, 0.13],
+  const lumps: Array<[number, number, number, number, number, number]> = [
+    [0.0, 0.1, 0.0, 0.16, 0.1, 0.14],
+    [0.13, 0.09, 0.07, 0.12, 0.08, 0.1],
+    [-0.12, 0.09, 0.06, 0.11, 0.09, 0.1],
+    [0.04, 0.09, -0.13, 0.13, 0.07, 0.11],
+    [-0.07, 0.11, -0.09, 0.1, 0.08, 0.09],
+    [0.09, 0.12, -0.02, 0.09, 0.07, 0.08],
   ];
-  for (const [x, y, z, r] of chunks) {
-    const m = tag(new THREE.Mesh(new THREE.TetrahedronGeometry(r, 0), ember), index);
+  for (const [x, y, z, w, h, d] of lumps) {
+    const m = tag(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), coal), index);
     m.position.set(x, y, z);
-    m.rotation.set(x, y, z);
+    m.rotation.y = x * 2.4;
     g.add(m);
   }
+
+  for (const [x, z] of [
+    [0.02, 0.01],
+    [-0.08, 0.05],
+    [0.09, -0.06],
+  ] as const) {
+    const e = tag(new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.035, 0.05), ember), index);
+    e.position.set(x, 0.155, z);
+    g.add(e);
+  }
+
+  const fireRing = tag(new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.048, 10, 40), flame), index);
+  fireRing.rotation.x = Math.PI / 2;
+  fireRing.position.y = 0.07;
+  g.add(fireRing);
+
+  const rangeRing = tag(new THREE.Mesh(new THREE.TorusGeometry(0.54, 0.016, 8, 48), range), index);
+  rangeRing.rotation.x = Math.PI / 2;
+  rangeRing.position.y = 0.028;
+  g.add(rangeRing);
+
+  const tongue = new THREE.ConeGeometry(0.038, 0.14, 5);
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2;
+    const f = tag(new THREE.Mesh(tongue, flame), index);
+    f.position.set(Math.cos(a) * 0.36, 0.15, Math.sin(a) * 0.36);
+    g.add(f);
+  }
+
   return g;
 }
 
-function jobjeevesDesk(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+function jobjeevesDesk(glow: string, index: number, materials: THREE.MeshStandardMaterial[]): THREE.Group {
   const g = new THREE.Group();
   const blotter = mat("#2c3832", glow, { roughness: 0.62, metalness: 0.08, emissiveIntensity: 0.04 });
   const file = mat("#d8ddd6", glow, { roughness: 0.48, metalness: 0.04, emissiveIntensity: 0.02 });
@@ -386,7 +410,7 @@ function jobjeevesDesk(glow: string, index: number, materials: THREE.MeshPhysica
   return g;
 }
 
-function fallbackBlock(project: Project, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+function fallbackBlock(project: Project, index: number, materials: THREE.MeshStandardMaterial[]): THREE.Group {
   const g = new THREE.Group();
   const m = mat("#4a463c", project.glow, { roughness: 0.5 });
   materials.push(m);
@@ -397,7 +421,7 @@ function fallbackBlock(project: Project, index: number, materials: THREE.MeshPhy
 }
 
 export function createPiece(project: Project, index: number): StudioPiece {
-  const materials: THREE.MeshPhysicalMaterial[] = [];
+  const materials: THREE.MeshStandardMaterial[] = [];
   const pickables: THREE.Object3D[] = [];
   const builders: Record<string, () => THREE.Group> = {
     quell: () => quellCube(project.glow, index, materials),
