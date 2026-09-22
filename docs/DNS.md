@@ -1,5 +1,7 @@
 # DNS — menhir-holdings.com (unpaid)
 
+Ops SoT is **Hadrien** (lattice + live snapshot + drift). Mutations stay in Cursor via the `hadrien` skill — this file is the hub bookmark policy only.
+
 **Canonical hub URL:** https://menhir-holdings.vercel.app
 
 The custom domain is **not paid**. Do not redirect `menhir-holdings.vercel.app` (or other Vercel aliases) to `menhir-holdings.com`. Leave PR preview hosts alone.
