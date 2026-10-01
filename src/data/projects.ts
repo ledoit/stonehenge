@@ -12,7 +12,7 @@ export const hubUrl = "https://koalasalmon.com";
 
 /**
  * Presentable lattice. Off-table: Kaiser (hidden), Suplex (blank WASM),
- * Vega (skeleton), Gamolingo, and the supplier shell (not on the table).
+ * Vega (skeleton) and Gamolingo (not on the table).
  */
 export const projects: Project[] = [
   {
