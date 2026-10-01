@@ -1,10 +1,8 @@
-# Menhir Holdings
+# Stonehenge
 
-Repo / Vercel project: **`stonehenge`**.
+Repo: **`ledoit/stonehenge`**. Vercel project: **`stonehenge`**.
 
-Canonical hub while the custom domain is unpaid: **https://menhir-holdings.vercel.app**
-
-(`menhir-holdings.com` is not the bookmark. Do not redirect vercel.app hosts to it.)
+Canonical hub: **https://koalasalmon.com**
 
 The apex site is a **studio table** — distinct product objects on a shallow architectural plate. The 3D world fills the viewport; click an object to bring it forward, then enter. The lattice is curated: only complete, live surfaces. Quell is first.
 
@@ -32,21 +30,21 @@ Phil tests the Vercel preview URL, not local `npm run dev`.
 
 | Product | URL |
 |---------|-----|
-| Hub | https://menhir-holdings.vercel.app |
-| Quell | https://quellcube.vercel.app |
-| Freeze | https://freeze-lilac.vercel.app |
-| Gamma | https://gamma-three-lime.vercel.app |
-| Strob | https://strob-menhir-holdings.vercel.app |
-| Vecchio | https://vecchio-menhir-holdings.vercel.app |
-| Paid | https://paid-menhir-holdings.vercel.app |
-| Matrix Maze | https://matmaz.vercel.app |
-| Inferno | https://inferno-ruby.vercel.app |
-| JobJeeves | https://jobjeeves-menhir-holdings.vercel.app |
+| Hub | https://koalasalmon.com |
+| Quell | https://quell.koalasalmon.com |
+| Freeze | https://freeze.koalasalmon.com |
+| Prisma | https://prisma.koalasalmon.com |
+| Strob | https://strob.koalasalmon.com |
+| Vecchio | https://vecchio.koalasalmon.com |
+| Paid | https://paid.koalasalmon.com |
+| Matrix Maze | https://matrix-maze.koalasalmon.com |
+| Inferno | https://inferno.koalasalmon.com |
+| JobJeeves | https://jobjeeves.koalasalmon.com |
 
-Off-table (not presentable as a public object): Kaiser (`kaiser-mu.vercel.app`).
+Off-table: Kaiser at `kaiser.koalasalmon.com`.
 
 See [docs/DNS.md](./docs/DNS.md) and [docs/VERCEL.md](./docs/VERCEL.md).
 
 ## License
 
-All Rights Reserved © Menhir Holdings
+All Rights Reserved © Philippe Ledoit

@@ -7,20 +7,19 @@ export type Project = {
   height: number;
 };
 
-/** Canonical hub while menhir-holdings.com is unpaid. */
-export const hubUrl = "https://menhir-holdings.vercel.app";
+/** Canonical hub. */
+export const hubUrl = "https://koalasalmon.com";
 
 /**
- * Presentable lattice — live vercel.app. Diaries off-table (Phil).
- * Off-table: Kaiser (hidden), Erudite/Suplex (blank WASM), Vega (skeleton in review),
- * Vantage/Silo/Gamolingo/menhir-web (not production), shelved work.
+ * Presentable lattice. Off-table: Kaiser (hidden), Suplex (blank WASM),
+ * Vega (skeleton), Vantage/Silo/Gamolingo/menhir-web (not on the table).
  */
 export const projects: Project[] = [
   {
     id: "quell",
     name: "Quell",
     tagline: "OLL / PLL flashcards. One toggle, one Next.",
-    href: "https://quellcube.vercel.app",
+    href: "https://quell.koalasalmon.com",
     glow: "#d4c4a8",
     height: 3.6,
   },
@@ -28,15 +27,15 @@ export const projects: Project[] = [
     id: "freeze",
     name: "Freeze",
     tagline: "Pause every tab with one click.",
-    href: "https://freeze-lilac.vercel.app",
+    href: "https://freeze.koalasalmon.com",
     glow: "#6ec8e0",
     height: 3.2,
   },
   {
-    id: "gamma",
-    name: "Gamma",
+    id: "prisma",
+    name: "Prisma",
     tagline: "Harmonic palettes from spectral math.",
-    href: "https://gamma-three-lime.vercel.app",
+    href: "https://prisma.koalasalmon.com",
     glow: "#d74242",
     height: 3.05,
   },
@@ -44,7 +43,7 @@ export const projects: Project[] = [
     id: "strob",
     name: "Strob",
     tagline: "Party lighting plot. One desk, many walls.",
-    href: "https://strob-menhir-holdings.vercel.app",
+    href: "https://strob.koalasalmon.com",
     glow: "#ff3d8a",
     height: 3.25,
   },
@@ -52,7 +51,7 @@ export const projects: Project[] = [
     id: "vecchio",
     name: "Vecchio",
     tagline: "Shared text across devices. One code, many screens.",
-    href: "https://vecchio-menhir-holdings.vercel.app",
+    href: "https://vecchio.koalasalmon.com",
     glow: "#c4a574",
     height: 3.1,
   },
@@ -60,7 +59,7 @@ export const projects: Project[] = [
     id: "paid",
     name: "Paid",
     tagline: "Morning work planner. Thirty-minute blocks.",
-    href: "https://paid-menhir-holdings.vercel.app",
+    href: "https://paid.koalasalmon.com",
     glow: "#e8d5a3",
     height: 3.0,
   },
@@ -68,7 +67,7 @@ export const projects: Project[] = [
     id: "matrix-maze",
     name: "Matrix Maze",
     tagline: "Eight-level labyrinth. Web and desktop.",
-    href: "https://matmaz.vercel.app",
+    href: "https://matrix-maze.koalasalmon.com",
     glow: "#4ad46a",
     height: 3.35,
   },
@@ -76,7 +75,7 @@ export const projects: Project[] = [
     id: "inferno",
     name: "Inferno",
     tagline: "LoL fight reads under motor load.",
-    href: "https://inferno-ruby.vercel.app",
+    href: "https://inferno.koalasalmon.com",
     glow: "#ff5a1f",
     height: 3.45,
   },
@@ -84,7 +83,7 @@ export const projects: Project[] = [
     id: "jobjeeves",
     name: "JobJeeves",
     tagline: "Hiring desk. File, screen, packet.",
-    href: "https://jobjeeves-menhir-holdings.vercel.app",
+    href: "https://jobjeeves.koalasalmon.com",
     glow: "#3d5c4a",
     height: 3.15,
   },
