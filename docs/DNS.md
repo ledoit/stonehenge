@@ -2,8 +2,6 @@
 
 Stonehenge is the apex. Each hosted project is a subdomain. Cloudflare zone `koalasalmon.com` is the DNS source of truth. Records stay grey-cloud until the certificate is green.
 
-`menhir-holdings.com` is mail only (Zoho MX, SPF, DKIM, `zb04905990`). Do not point product hosts at it. Do not touch those mail records.
-
 `ledoit.dev` does not resolve. It is not in this map.
 
 | Host | Project |

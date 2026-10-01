@@ -31,10 +31,6 @@ Checkouts live under `personal/Stonehenge/`, same lane names as before (`Audio/`
 
 Resumes and transcripts are `personal/resumes/`, beside Stonehenge, not a project here.
 
-Diaries, Erudite, and Elastica are deleted.
-
 ## Not on this host
 
-Hadrien stays Menhir Tech, on the Menhir Vercel team, not on koalasalmon.com.
-
-`mina-yu.com` stays on photoport. Reno projects stay on the Menhir team.
+`mina-yu.com` stays on photoport. Reno projects stay on the same Vercel team.
