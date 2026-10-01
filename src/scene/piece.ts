@@ -15,7 +15,7 @@ export type StudioPiece = {
 const LAYOUT: Record<string, { x: number; z: number; rot: number }> = {
   quell: { x: -1.85, z: 0.12, rot: 0.42 },
   freeze: { x: -1.68, z: -1.05, rot: 0.12 },
-  gamma: { x: 0.04, z: -1.22, rot: -0.2 },
+  prisma: { x: 0.04, z: -1.22, rot: -0.2 },
   strob: { x: 1.78, z: -1.0, rot: 0.08 },
   vecchio: { x: 1.88, z: 0.18, rot: -0.28 },
   paid: { x: 1.22, z: 1.0, rot: 0.18 },
@@ -177,7 +177,7 @@ function freezeIce(glow: string, index: number, materials: THREE.MeshPhysicalMat
   return g;
 }
 
-function gammaPrism(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
+function prismaPrism(glow: string, index: number, materials: THREE.MeshPhysicalMaterial[]): THREE.Group {
   const g = new THREE.Group();
   const glass = mat("#c4544a", glow, {
     roughness: 0.12,
@@ -402,7 +402,7 @@ export function createPiece(project: Project, index: number): StudioPiece {
   const builders: Record<string, () => THREE.Group> = {
     quell: () => quellCube(project.glow, index, materials),
     freeze: () => freezeIce(project.glow, index, materials),
-    gamma: () => gammaPrism(project.glow, index, materials),
+    prisma: () => prismaPrism(project.glow, index, materials),
     strob: () => strobLamp(project.glow, index, materials),
     vecchio: () => vecchioPapers(project.glow, index, materials),
     paid: () => paidPlanner(project.glow, index, materials),

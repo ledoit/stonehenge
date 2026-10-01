@@ -1,6 +1,6 @@
 # kaiser
 
-Music preview console for Menhir game stems. Hidden deploy — not listed on the stonehenge portal.
+Music preview console for game stems. Hidden deploy — not listed on the stonehenge portal.
 
 ## Local
 
@@ -22,9 +22,9 @@ OGG stems are optional. Drop files under `public/projects/<project-id>/audio/` m
 
 Kaiser is a **sub-app** inside the `stonehenge` repo. It is not a separate Vercel project in the published lattice.
 
-1. Open the **stonehenge** project in Vercel (`menhir-tech` team).
+1. Open the **stonehenge** project in Vercel (team `menhir-holdings`).
 2. **Settings → General → Root Directory** → set to `kaiser` for a dedicated kaiser deployment, **or** add a second Vercel project pointing at the same repo with Root Directory `kaiser` (recommended if the hub must stay at repo root).
-3. **Settings → Domains** → add `kaiser.menhir-holdings.com`.
+3. **Settings → Domains** → add `kaiser.koalasalmon.com`.
 4. Copy the CNAME target Vercel shows (usually `cname.vercel-dns.com` or `*.vercel-dns-017.com`).
 5. In Cloudflare, add the CNAME (see `../docs/DNS.md`).
 6. Push to `main` — production deploy follows the stonehenge GitHub link.
@@ -47,4 +47,4 @@ Expected OGG paths (relative to project folder):
 
 `accent` is always synthesized at runtime.
 
-**Canonical repo:** https://github.com/menhir-holdings/kaiser (Hobby plan cannot Git-connect private org repos). Local agent path: `Website/Kaiser`.
+**Canonical repo:** https://github.com/ledoit/kaiser-console (Hobby plan cannot Git-connect private org repos). Local agent path: `Website/Kaiser`.

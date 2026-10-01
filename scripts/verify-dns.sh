@@ -1,38 +1,28 @@
 #!/usr/bin/env bash
-# Quick DNS smoke check for leftover menhir-holdings.com records.
-# Canonical bookmarks are *.vercel.app — see docs/DNS.md.
+# DNS smoke check for koalasalmon.com.
 # Usage: ./scripts/verify-dns.sh
 
 set -euo pipefail
 
-echo "Canonical hub: https://menhir-holdings.vercel.app"
-echo "(menhir-holdings.com is unpaid; records below are leftovers.)"
+echo "Canonical hub: https://koalasalmon.com/"
 echo
 
-PRODUCTS=(
-  matrix-maze strob vecchio jobjeeves paid gamma inferno vega kaiser diaries freeze
+HOSTS=(
+  koalasalmon.com
+  www.koalasalmon.com
+  quell.koalasalmon.com
+  freeze.koalasalmon.com
+  prisma.koalasalmon.com
+  strob.koalasalmon.com
+  vecchio.koalasalmon.com
+  paid.koalasalmon.com
+  matrix-maze.koalasalmon.com
+  inferno.koalasalmon.com
+  jobjeeves.koalasalmon.com
+  kaiser.koalasalmon.com
 )
 
-echo "Checking CNAME targets (Cloudflare DNS only)..."
-for sub in "${PRODUCTS[@]}"; do
-  host="${sub}.menhir-holdings.com"
-  if cname=$(dig +short CNAME "$host" 2>/dev/null | head -1); then
-    if [[ -n "$cname" ]]; then
-      echo "OK  $host -> $cname"
-    else
-      a=$(dig +short A "$host" 2>/dev/null | head -1)
-      if [[ -n "$a" ]]; then
-        echo "OK  $host -> A $a"
-      else
-        echo "MISS $host (no CNAME/A record)"
-      fi
-    fi
-  fi
-done
-
-echo
-echo "Checking apex + www..."
-for host in menhir-holdings.com www.menhir-holdings.com; do
+for host in "${HOSTS[@]}"; do
   cname=$(dig +short CNAME "$host" 2>/dev/null | head -1)
   a=$(dig +short A "$host" 2>/dev/null | head -1)
   if [[ -n "$cname" ]]; then
